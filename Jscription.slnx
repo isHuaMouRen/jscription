@@ -1,3 +1,4 @@
 <Solution>
-  <Project Path="Jscription/Jscription.csproj" />
+  <Project Path="Jscription.Core/Jscription.Core.csproj" />
+  <Project Path="Jscription.Runner/Jscription.Runner.csproj" />
 </Solution>
