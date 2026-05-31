@@ -4,7 +4,8 @@
     {
         private static readonly Dictionary<string, Type> _registry = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "print", typeof(CmdPrint) }
+            { "print", typeof(CmdPrint) },
+            { "printline", typeof(CmdPrint) }
         };
 
         public static CmdRoot? CreateCommand(string? cmdName, Dictionary<string, object>? args)
