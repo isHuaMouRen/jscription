@@ -12,18 +12,14 @@ namespace Jscription.Core.Commands
         {
             if (args == null) return;
 
+            var insensitiveArgs = new Dictionary<string, object>(args, StringComparer.OrdinalIgnoreCase);
             var properties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
             foreach (var prop in properties)
             {
                 string targetKey = prop.Name;
 
-                if (!args.ContainsKey(targetKey))
-                {
-                    targetKey = prop.Name.ToLower();
-                }
-
-                if (args.TryGetValue(targetKey, out var rawValue))
+                if (insensitiveArgs.TryGetValue(targetKey, out var rawValue))
                 {
                     try
                     {
