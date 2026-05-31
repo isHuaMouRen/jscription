@@ -47,6 +47,8 @@ namespace Jscription.Core.Utils
                 if (parsedCmd == null)
                     throw new JscriptionUnknownCommandException(cmd.Command);
 
+                parsedCmd.Initialize(cmd.Arguments, cmd.Command ?? parsedCmd.GetType().Name);
+
                 cmdList.Add(parsedCmd);
             }
 
