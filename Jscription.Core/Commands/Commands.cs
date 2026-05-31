@@ -8,7 +8,7 @@ namespace Jscription.Core.Commands
     {
         public abstract void Run();
 
-        public void Initialize(Dictionary<string, object>? args, string commandName)
+        public void Initialize(Dictionary<string, object>? args, string commandName, Dictionary<string, object>? variables)
         {
             if (args == null) return;
 
@@ -23,6 +23,8 @@ namespace Jscription.Core.Commands
                 {
                     try
                     {
+                        rawValue = ResolveVariable(rawValue, variables);
+
                         var token = Newtonsoft.Json.Linq.JToken.FromObject(rawValue);
                         var convertedValue = token.ToObject(prop.PropertyType);
                         prop.SetValue(this, convertedValue);
@@ -37,6 +39,39 @@ namespace Jscription.Core.Commands
                     }
                 }
             }
+        }
+
+        private object ResolveVariable(object rawValue, Dictionary<string, object>? variables)
+        {
+            if (rawValue is string strValue)
+            {
+                strValue = strValue.Trim();
+
+                if (strValue.StartsWith("$") && strValue.EndsWith("$") && strValue.Length > 2)
+                {
+                    string varName = strValue.Substring(1, strValue.Length - 2);
+                    if (variables != null && variables.TryGetValue(varName, out var varValue))
+                    {
+                        return varValue;
+                    }
+                    throw new Exception($"未找到变量: {varName}");
+                }
+
+                if (variables != null)
+                {
+                    foreach (var variable in variables)
+                    {
+                        string placeholder = $"${variable.Key}$";
+                        if (strValue.Contains(placeholder))
+                        {
+                            strValue = strValue.Replace(placeholder, variable.Value?.ToString() ?? "");
+                        }
+                    }
+                    return strValue;
+                }
+            }
+
+            return rawValue;
         }
     }
 
@@ -70,6 +105,13 @@ namespace Jscription.Core.Commands
             public string? content { get; set; }
 
             public override void Run() => File.WriteAllText(path, content);
+        }
+        
+        public class Delete : CmdRoot
+        {
+            public required string path { get; set; }
+
+            public override void Run() => File.Delete(path);
         }
     }
 }

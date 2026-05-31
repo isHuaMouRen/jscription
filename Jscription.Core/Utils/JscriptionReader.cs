@@ -29,15 +29,12 @@ namespace Jscription.Core.Utils
         public static JscriptionExecutInfo AnalysisDoc(JscriptionDoc? doc)
         {
             //基础检查
-            if (doc == null)
-                throw new Exception("脚本不能为空");
-
-            if (doc.Name == null)
-                throw new JscriptionMissingFieldException("name", "脚本名字不能为空，请使用 \"name\" 属性");
-
-            if (doc.Commands == null)
-                throw new JscriptionMissingFieldException("commands", "脚本不能没有命令列表，即使没有命令也要使用 \"commands\": []");
-
+            if (doc == null) throw new Exception("脚本不能为空");
+            if (doc.Name == null) throw new JscriptionMissingFieldException("name", "脚本名字不能为空，请使用 \"name\" 属性");
+            if (doc.Commands == null) throw new JscriptionMissingFieldException("commands", "脚本不能没有命令列表，即使没有命令也要使用 \"commands\": []");
+            
+            var variables = doc.Variables ?? new Dictionary<string, object>();
+            
             var cmdList = new List<CmdRoot>();
             foreach (var cmd in doc.Commands)
             {
@@ -47,7 +44,8 @@ namespace Jscription.Core.Utils
                 if (parsedCmd == null)
                     throw new JscriptionUnknownCommandException(cmd.Command);
 
-                parsedCmd.Initialize(cmd.Arguments, cmd.Command ?? parsedCmd.GetType().Name);
+                string cmdName = cmd.Command ?? parsedCmd.GetType().Name;
+                parsedCmd.Initialize(cmd.Arguments, cmd.Command ?? parsedCmd.GetType().Name, variables);
 
                 cmdList.Add(parsedCmd);
             }

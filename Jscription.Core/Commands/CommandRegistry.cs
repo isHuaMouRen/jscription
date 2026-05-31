@@ -6,7 +6,8 @@
         {
             { "console.print", typeof(CmdConsole.Print) },
             { "console.printline", typeof(CmdConsole.PrintLine) },
-            { "file.write", typeof(CmdFile.Write) }
+            { "file.write", typeof(CmdFile.Write) },
+            { "file.delete", typeof(CmdFile.Delete) }
         };
 
         public static CmdRoot? CreateCommand(string? cmdName, Dictionary<string, object>? args)
@@ -15,7 +16,6 @@
                 return null;
 
             var instance = (CmdRoot)Activator.CreateInstance(cmdType)!;
-            instance.Initialize(args, cmdName);
             return instance;
         }
     }

@@ -8,6 +8,9 @@ namespace Jscription.Core.Classes
         [JsonProperty("name")]
         public string? Name { get; set; }
 
+        [JsonProperty("variables")]
+        public Dictionary<string, object>? Variables { get; set; }
+
         [JsonProperty("commands")]
         public List<CommandInfo>? Commands { get; set; }
 
