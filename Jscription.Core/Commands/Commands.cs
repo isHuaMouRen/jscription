@@ -1,4 +1,5 @@
 ﻿using Jscription.Core.Exceptions;
+using System.Reflection;
 
 namespace Jscription.Core.Commands
 {
@@ -7,23 +8,48 @@ namespace Jscription.Core.Commands
     {
         public abstract void Run();
 
-        public abstract void Initialize(Dictionary<string, object>? args);
+        public void Initialize(Dictionary<string, object>? args, string commandName)
+        {
+            if (args == null) return;
+
+            var properties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var prop in properties)
+            {
+                string targetKey = prop.Name;
+
+                if (!args.ContainsKey(targetKey))
+                {
+                    targetKey = prop.Name.ToLower();
+                }
+
+                if (args.TryGetValue(targetKey, out var rawValue))
+                {
+                    try
+                    {
+                        var convertedValue = Convert.ChangeType(rawValue, prop.PropertyType);
+                        prop.SetValue(this, convertedValue);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new JscriptionInvalidArgumentsException(
+                            "CmdRoot",
+                            targetKey,
+                            $"参数类型不匹配。无法将 {rawValue?.GetType().Name} 转换为 {prop.PropertyType.Name}。"
+                        );
+                    }
+                }
+            }
+        }
     }
 
+    //==========================================================================================
+    //命令实现
+    //==========================================================================================
 
     public class CmdPrint : CmdRoot
     {
         public string? Message { get; set; }
-
-        public override void Initialize(Dictionary<string, object>? args)
-        {
-            if (args == null || !args.ContainsKey("message"))
-                throw new JscriptionInvalidArgumentsException("print", "message", "缺少必要的 'message' 参数。");
-            if (args["message"] is not string messageStr)
-                throw new JscriptionInvalidArgumentsException("print", "message", "参数类型必须是字符串。");
-
-            Message = messageStr;
-        }
 
         public override void Run() => Console.Write(Message);
     }
@@ -31,16 +57,6 @@ namespace Jscription.Core.Commands
     public class CmdPrintLine : CmdRoot
     {
         public string? Message { get; set; }
-
-        public override void Initialize(Dictionary<string, object>? args)
-        {
-            if (args == null || !args.ContainsKey("message"))
-                throw new JscriptionInvalidArgumentsException("print", "message", "缺少必要的 'message' 参数。");
-            if (args["message"] is not string messageStr)
-                throw new JscriptionInvalidArgumentsException("print", "message", "参数类型必须是字符串。");
-
-            Message = messageStr;
-        }
 
         public override void Run() => Console.WriteLine(Message);
     }
