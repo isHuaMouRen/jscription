@@ -35,3 +35,5 @@ Welcome to Jscription Runner <version>
 
 Hello world!
 ```
+
+如果你想更深入的学习，请查看 [Jscription 文档](/docs/home.md)
