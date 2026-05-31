@@ -30,7 +30,7 @@ namespace Jscription.Core.Commands
                         var convertedValue = Convert.ChangeType(rawValue, prop.PropertyType);
                         prop.SetValue(this, convertedValue);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         throw new JscriptionInvalidArgumentsException(
                             "CmdRoot",
