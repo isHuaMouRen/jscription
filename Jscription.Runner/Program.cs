@@ -2,6 +2,7 @@
 using System.IO;
 using Jscription.Core.Utils;
 using Jscription.Core.Exceptions;
+using Jscription.Runner.Classes;
 
 namespace Jscription.Runner
 {
@@ -9,6 +10,14 @@ namespace Jscription.Runner
     {
         static int Main(string[] args)
         {
+            //欢迎信息
+            var welcomeMessage = $"""
+                Welcome to Jscription Runner {Global.Version}
+
+                """;
+            Console.WriteLine(welcomeMessage);
+
+
             string? sourcePath = null;
 
             try
@@ -32,26 +41,26 @@ namespace Jscription.Runner
                     }
                 }
 
-                if (string.IsNullOrEmpty(sourcePath))
+                //进入执行逻辑
+                if (!string.IsNullOrEmpty(sourcePath))
                 {
-                    LogError("错误: 未指定输入脚本。");
-                    return 1;
+                    if (!File.Exists(sourcePath))
+                    {
+                        LogError($"错误: 找不到指定的脚本文件 -> \"{Path.GetFullPath(sourcePath)}\"");
+                        return 1;
+                    }
+
+                    // 解析与执行
+                    var jsonContent = File.ReadAllText(sourcePath);
+                    var jscriptionDoc = JscriptionReader.ReadDoc(jsonContent);
+                    var jscriptionExecuteInfo = JscriptionReader.AnalysisDoc(jscriptionDoc);
+
+                    // 运行
+                    var executer = new JscriptionExecuter { ExecuteInfo = jscriptionExecuteInfo };
+                    executer.Run();
                 }
 
-                if (!File.Exists(sourcePath))
-                {
-                    LogError($"错误: 找不到指定的脚本文件 -> \"{Path.GetFullPath(sourcePath)}\"");
-                    return 1;
-                }
-
-                // 解析与执行
-                var jsonContent = File.ReadAllText(sourcePath);
-                var jscriptionDoc = JscriptionReader.ReadDoc(jsonContent);
-                var jscriptionExecuteInfo = JscriptionReader.AnalysisDoc(jscriptionDoc);
-
-                // 运行
-                var executer = new JscriptionExecuter { ExecuteInfo = jscriptionExecuteInfo };
-                executer.Run();
+                
             }
             catch (JscriptionParseException ex)
             {
