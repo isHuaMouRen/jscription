@@ -1,4 +1,5 @@
-﻿using Jscription.Core.Exceptions;
+﻿using Jscription.Core.Classes;
+using Jscription.Core.Exceptions;
 using System.Reflection;
 
 namespace Jscription.Core.Commands
@@ -104,6 +105,56 @@ namespace Jscription.Core.Commands
 
             return rawValue;
         }
+
+        protected bool EvaluateCondition(object? condition)
+        {
+            if (condition == null) return false;
+
+            if (condition is bool b) return b;
+
+            string condStr = condition.ToString()?.Trim() ?? "";
+            if (string.IsNullOrEmpty(condStr)) return false;
+
+            if (bool.TryParse(condStr, out bool parsedBool)) return parsedBool;
+
+            string[] operators = { "==", "!=", ">=", "<=", ">", "<" };
+            foreach (var op in operators)
+            {
+                if (condStr.Contains(op))
+                {
+                    var parts = condStr.Split(new[] { op }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length != 2) break;
+
+                    string left = parts[0].Trim();
+                    string right = parts[1].Trim();
+
+                    if (double.TryParse(left, out double numL) && double.TryParse(right, out double numR))
+                    {
+                        return op switch
+                        {
+                            "==" => numL == numR,
+                            "!=" => numL != numR,
+                            ">" => numL > numR,
+                            "<" => numL < numR,
+                            ">=" => numL >= numR,
+                            "<=" => numL <= numR,
+                            _ => false
+                        };
+                    }
+                    else
+                    {
+                        return op switch
+                        {
+                            "==" => left.Equals(right, StringComparison.OrdinalIgnoreCase),
+                            "!=" => !left.Equals(right, StringComparison.OrdinalIgnoreCase),
+                            _ => false
+                        };
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 
     //==========================================================================================
@@ -186,6 +237,39 @@ namespace Jscription.Core.Commands
             public override object? Run()
             {
                 Thread.Sleep(time);
+                return null;
+            }
+        }
+
+        public class If : CmdRoot
+        {
+            public required object condition { get; set; }
+
+            public List<JscriptionDoc.CommandInfo>? then { get; set; }
+            public List<JscriptionDoc.CommandInfo>? @else { get; set; }//else为保留关键字，@以作为变量名
+
+            public override object? Run()
+            {
+                if (_globalVariables == null)
+                    throw new Exception($"命令 [{CommandName}] 运行时丢失了上下文变量字典。");
+
+                bool isTrue = EvaluateCondition(condition);
+                var targetCommands = isTrue ? then : @else;
+
+                if (targetCommands != null)
+                {
+                    foreach (var cmdInfo in targetCommands)
+                    {
+                        var subCmd = CommandRegistry.CreateCommand(cmdInfo.Command, cmdInfo.Arguments);
+                        if (subCmd == null)
+                            throw new Exception($"If 内部包含未知的命令类型: \"{cmdInfo.Command}\"");
+
+                        string subCmdName = cmdInfo.Command ?? subCmd.GetType().Name;
+                        subCmd.Initialize(cmdInfo.Arguments, subCmdName, _globalVariables, cmdInfo.Return);
+                        subCmd.Execute();
+                    }
+                }
+
                 return null;
             }
         }
