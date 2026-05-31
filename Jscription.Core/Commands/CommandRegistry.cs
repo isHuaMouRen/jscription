@@ -8,6 +8,7 @@
             { "console.printline", typeof(CmdConsole.PrintLine) },
             { "file.write", typeof(CmdFile.Write) },
             { "file.delete", typeof(CmdFile.Delete) },
+            { "file.read", typeof(CmdFile.Read) },
             { "variable.set", typeof(CmdVariable.Set) }
         };
 

@@ -19,6 +19,7 @@ namespace Jscription.Core.Commands
             this.CommandName = commandName;
             this._globalVariables = variables;
             this._rawArgs = args;
+            this.ReturnVarName = returnVarName;
         }
 
         public void Execute()
@@ -142,6 +143,16 @@ namespace Jscription.Core.Commands
             public required string path { get; set; }
 
             public override object? Run() { File.Delete(path); return null; }
+        }
+
+        public class Read : CmdRoot
+        {
+            public required string path { get; set; }
+
+            public override object? Run()
+            {
+                return File.ReadAllText(path);
+            }
         }
     }
 
