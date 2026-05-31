@@ -11,7 +11,8 @@
             { "file.read", typeof(CmdFile.Read) },
             { "variable.set", typeof(CmdVariable.Set) },
             { "control.sleep", typeof(CmdControl.Sleep) },
-            { "control.if", typeof(CmdControl.If) }
+            { "control.if", typeof(CmdControl.If) },
+            { "control.loop", typeof(CmdControl.Loop) }
         };
 
         public static CmdRoot? CreateCommand(string? cmdName, Dictionary<string, object>? args)
