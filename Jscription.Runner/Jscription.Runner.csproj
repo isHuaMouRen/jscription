@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Jscription.Core\Jscription.Core.csproj" />
+  </ItemGroup>
+
 </Project>
