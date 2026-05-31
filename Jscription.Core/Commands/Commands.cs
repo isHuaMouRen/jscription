@@ -27,13 +27,14 @@ namespace Jscription.Core.Commands
                 {
                     try
                     {
-                        var convertedValue = Convert.ChangeType(rawValue, prop.PropertyType);
+                        var token = Newtonsoft.Json.Linq.JToken.FromObject(rawValue);
+                        var convertedValue = token.ToObject(prop.PropertyType);
                         prop.SetValue(this, convertedValue);
                     }
                     catch (Exception)
                     {
                         throw new JscriptionInvalidArgumentsException(
-                            "CmdRoot",
+                            commandName,
                             targetKey,
                             $"参数类型不匹配。无法将 {rawValue?.GetType().Name} 转换为 {prop.PropertyType.Name}。"
                         );
