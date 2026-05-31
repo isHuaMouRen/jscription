@@ -21,6 +21,9 @@ namespace Jscription.Core.Classes
 
             [JsonProperty("arguments")]
             public Dictionary<string, object>? Arguments { get; set; }
+
+            [JsonProperty("return")]
+            public string? Return { get; set; }
         }
     }
 

@@ -7,14 +7,14 @@ namespace Jscription.Core.Commands
     public abstract class CmdRoot
     {
         protected Dictionary<string, object>? _globalVariables;
-
         private Dictionary<string, object>? _rawArgs;
 
         public string CommandName { get; private set; } = "Unknown";
+        public string? ReturnVarName { get; private set; }
 
-        public abstract void Run();
+        public abstract object? Run();
 
-        public void Initialize(Dictionary<string, object>? args, string commandName, Dictionary<string, object> variables)
+        public void Initialize(Dictionary<string, object>? args, string commandName, Dictionary<string, object> variables, string? returnVarName = null)
         {
             this.CommandName = commandName;
             this._globalVariables = variables;
@@ -53,7 +53,12 @@ namespace Jscription.Core.Commands
                 }
             }
 
-            Run();
+            object? result = Run();
+
+            if (!string.IsNullOrWhiteSpace(ReturnVarName) && _globalVariables != null)
+            {
+                _globalVariables[ReturnVarName] = result!;
+            }
         }
 
         private object ResolveVariable(object rawValue, Dictionary<string, object>? variables)
@@ -110,14 +115,14 @@ namespace Jscription.Core.Commands
         {
             public string? Message { get; set; }
 
-            public override void Run() => Console.Write(Message);
+            public override object? Run() { Console.Write(Message); return null; }
         }
 
         public class PrintLine : CmdRoot
         {
             public string? Message { get; set; }
 
-            public override void Run() => Console.WriteLine(Message);
+            public override object? Run() { Console.WriteLine(Message); return null; }
         }
     }
 
@@ -129,14 +134,14 @@ namespace Jscription.Core.Commands
             public required string path { get; set; }
             public string? content { get; set; }
 
-            public override void Run() => File.WriteAllText(path, content);
+            public override object? Run() { File.WriteAllText(path, content); return null; }
         }
-        
+
         public class Delete : CmdRoot
         {
             public required string path { get; set; }
 
-            public override void Run() => File.Delete(path);
+            public override object? Run() { File.Delete(path); return null; }
         }
     }
 
@@ -148,12 +153,14 @@ namespace Jscription.Core.Commands
             public required string VarName { get; set; }
             public required object Value { get; set; }
 
-            public override void Run()
+            public override object? Run()
             {
                 if (_globalVariables == null)
                     throw new Exception($"命令 [{CommandName}] 运行时丢失了上下文变量字典。");
 
                 _globalVariables[VarName] = Value;
+
+                return null;
             }
         }
     }
