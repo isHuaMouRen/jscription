@@ -6,39 +6,54 @@ namespace Jscription.Core.Commands
     //基类
     public abstract class CmdRoot
     {
+        protected Dictionary<string, object>? _globalVariables;
+
+        private Dictionary<string, object>? _rawArgs;
+
+        public string CommandName { get; private set; } = "Unknown";
+
         public abstract void Run();
 
-        public void Initialize(Dictionary<string, object>? args, string commandName, Dictionary<string, object>? variables)
+        public void Initialize(Dictionary<string, object>? args, string commandName, Dictionary<string, object> variables)
         {
-            if (args == null) return;
+            this.CommandName = commandName;
+            this._globalVariables = variables;
+            this._rawArgs = args;
+        }
 
-            var insensitiveArgs = new Dictionary<string, object>(args, StringComparer.OrdinalIgnoreCase);
-            var properties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-            foreach (var prop in properties)
+        public void Execute()
+        {
+            if (_rawArgs != null)
             {
-                string targetKey = prop.Name;
+                var insensitiveArgs = new Dictionary<string, object>(_rawArgs, StringComparer.OrdinalIgnoreCase);
+                var properties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-                if (insensitiveArgs.TryGetValue(targetKey, out var rawValue))
+                foreach (var prop in properties)
                 {
-                    try
+                    if (insensitiveArgs.TryGetValue(prop.Name, out var rawValue))
                     {
-                        rawValue = ResolveVariable(rawValue, variables);
+                        try
+                        {
+                            var resolvedValue = ResolveVariable(rawValue, _globalVariables);
 
-                        var token = Newtonsoft.Json.Linq.JToken.FromObject(rawValue);
-                        var convertedValue = token.ToObject(prop.PropertyType);
-                        prop.SetValue(this, convertedValue);
-                    }
-                    catch (Exception)
-                    {
-                        throw new JscriptionInvalidArgumentsException(
-                            commandName,
-                            targetKey,
-                            $"参数类型不匹配。无法将 {rawValue?.GetType().Name} 转换为 {prop.PropertyType.Name}。"
-                        );
+                            var token = Newtonsoft.Json.Linq.JToken.FromObject(resolvedValue);
+                            var convertedValue = token.ToObject(prop.PropertyType);
+                            prop.SetValue(this, convertedValue);
+                        }
+                        catch (JscriptionVariableNotFoundException) { throw; }
+                        catch (Exception ex)
+                        {
+                            throw new JscriptionInvalidArgumentsException(
+                                CommandName,
+                                prop.Name,
+                                $"参数类型不匹配。详情: {ex.Message}"
+                            );
+                        }
                     }
                 }
             }
+
+            Run();
         }
 
         private object ResolveVariable(object rawValue, Dictionary<string, object>? variables)
@@ -54,17 +69,27 @@ namespace Jscription.Core.Commands
                     {
                         return varValue;
                     }
-                    throw new Exception($"未找到变量: {varName}");
+                    throw new JscriptionVariableNotFoundException(varName);
                 }
 
                 if (variables != null)
                 {
-                    foreach (var variable in variables)
+                    int startIndex = 0;
+                    while ((startIndex = strValue.IndexOf('$', startIndex)) != -1)
                     {
-                        string placeholder = $"${variable.Key}$";
-                        if (strValue.Contains(placeholder))
+                        int endIndex = strValue.IndexOf('$', startIndex + 1);
+                        if (endIndex == -1) break;
+
+                        string varName = strValue.Substring(startIndex + 1, endIndex - startIndex - 1);
+                        if (variables.TryGetValue(varName, out var varValue))
                         {
-                            strValue = strValue.Replace(placeholder, variable.Value?.ToString() ?? "");
+                            string placeholder = $"${varName}$";
+                            strValue = strValue.Replace(placeholder, varValue?.ToString() ?? "");
+                            startIndex = 0;
+                        }
+                        else
+                        {
+                            throw new JscriptionVariableNotFoundException(varName);
                         }
                     }
                     return strValue;
@@ -112,6 +137,24 @@ namespace Jscription.Core.Commands
             public required string path { get; set; }
 
             public override void Run() => File.Delete(path);
+        }
+    }
+
+    //变量
+    public class CmdVariable
+    {
+        public class Set : CmdRoot
+        {
+            public required string VarName { get; set; }
+            public required object Value { get; set; }
+
+            public override void Run()
+            {
+                if (_globalVariables == null)
+                    throw new Exception($"命令 [{CommandName}] 运行时丢失了上下文变量字典。");
+
+                _globalVariables[VarName] = Value;
+            }
         }
     }
 }

@@ -7,7 +7,8 @@
             { "console.print", typeof(CmdConsole.Print) },
             { "console.printline", typeof(CmdConsole.PrintLine) },
             { "file.write", typeof(CmdFile.Write) },
-            { "file.delete", typeof(CmdFile.Delete) }
+            { "file.delete", typeof(CmdFile.Delete) },
+            { "variable.set", typeof(CmdVariable.Set) }
         };
 
         public static CmdRoot? CreateCommand(string? cmdName, Dictionary<string, object>? args)

@@ -16,7 +16,7 @@ namespace Jscription.Core.Utils
 
                 try
                 {
-                    cmd.Run();
+                    cmd.Execute();
                 }
                 catch (Exception ex)
                 {

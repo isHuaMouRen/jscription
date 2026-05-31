@@ -55,4 +55,15 @@ namespace Jscription.Core.Exceptions
             Command = command;
         }
     }
+
+    //找不到变量
+    public class JscriptionVariableNotFoundException : JscriptionParseException
+    {
+        public string VariableName { get; }
+        public JscriptionVariableNotFoundException(string variableName)
+            : base($"未找到指定的变量: \"${variableName}$\"，请检查变量列表中是否定义了该变量。")
+        {
+            VariableName = variableName;
+        }
+    }
 }
