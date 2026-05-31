@@ -1,6 +1,4 @@
-﻿using Jscription.Core.Commands;
-
-namespace Jscription.Core.Utils
+﻿namespace Jscription.Core.Commands
 {
     public static class CommandRegistry
     {
