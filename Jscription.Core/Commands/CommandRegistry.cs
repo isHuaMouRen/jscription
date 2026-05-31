@@ -9,7 +9,8 @@
             { "file.write", typeof(CmdFile.Write) },
             { "file.delete", typeof(CmdFile.Delete) },
             { "file.read", typeof(CmdFile.Read) },
-            { "variable.set", typeof(CmdVariable.Set) }
+            { "variable.set", typeof(CmdVariable.Set) },
+            { "control.sleep", typeof(CmdControl.Sleep) }
         };
 
         public static CmdRoot? CreateCommand(string? cmdName, Dictionary<string, object>? args)

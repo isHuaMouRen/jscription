@@ -175,4 +175,19 @@ namespace Jscription.Core.Commands
             }
         }
     }
+
+    //流程控制
+    public class CmdControl
+    {
+        public class Sleep : CmdRoot
+        {
+            public required int time { get; set; }
+
+            public override object? Run()
+            {
+                Thread.Sleep(time);
+                return null;
+            }
+        }
+    }
 }
