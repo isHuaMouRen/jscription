@@ -46,21 +46,33 @@ namespace Jscription.Core.Commands
     //==========================================================================================
     //命令实现
     //==========================================================================================
-
+    //控制台
     public class CmdConsole
     {
-        public class CmdPrint : CmdRoot
+        public class Print : CmdRoot
         {
             public string? Message { get; set; }
 
             public override void Run() => Console.Write(Message);
         }
 
-        public class CmdPrintLine : CmdRoot
+        public class PrintLine : CmdRoot
         {
             public string? Message { get; set; }
 
             public override void Run() => Console.WriteLine(Message);
+        }
+    }
+
+    //文件
+    public class CmdFile
+    {
+        public class Write : CmdRoot
+        {
+            public required string path { get; set; }
+            public string? content { get; set; }
+
+            public override void Run() => File.WriteAllText(path, content);
         }
     }
 }
