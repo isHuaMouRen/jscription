@@ -1,6 +1,7 @@
 ﻿using Jscription.Core.Classes;
 using Jscription.Core.Exceptions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Jscription.Core.Commands
 {
@@ -117,43 +118,37 @@ namespace Jscription.Core.Commands
 
             if (bool.TryParse(condStr, out bool parsedBool)) return parsedBool;
 
-            string[] operators = { "==", "!=", ">=", "<=", ">", "<" };
-            foreach (var op in operators)
+            //支持操作符 == != >= <= > <
+            var match = Regex.Match(condStr, @"^(.+?)\s*(==|!=|>=|<=|>|<)\s*(.+)$");
+            if (!match.Success)
             {
-                if (condStr.Contains(op))
-                {
-                    var parts = condStr.Split(new[] { op }, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length != 2) break;
-
-                    string left = parts[0].Trim();
-                    string right = parts[1].Trim();
-
-                    if (double.TryParse(left, out double numL) && double.TryParse(right, out double numR))
-                    {
-                        return op switch
-                        {
-                            "==" => numL == numR,
-                            "!=" => numL != numR,
-                            ">" => numL > numR,
-                            "<" => numL < numR,
-                            ">=" => numL >= numR,
-                            "<=" => numL <= numR,
-                            _ => false
-                        };
-                    }
-                    else
-                    {
-                        return op switch
-                        {
-                            "==" => left.Equals(right, StringComparison.OrdinalIgnoreCase),
-                            "!=" => !left.Equals(right, StringComparison.OrdinalIgnoreCase),
-                            _ => false
-                        };
-                    }
-                }
+                return false;
             }
 
-            return false;
+            string left = match.Groups[1].Value.Trim();
+            string op = match.Groups[2].Value;
+            string right = match.Groups[3].Value.Trim();
+
+            if (double.TryParse(left, out double numL) && double.TryParse(right, out double numR))
+            {
+                return op switch
+                {
+                    "==" => numL == numR,
+                    "!=" => numL != numR,
+                    ">" => numL > numR,
+                    "<" => numL < numR,
+                    ">=" => numL >= numR,
+                    "<=" => numL <= numR,
+                    _ => false
+                };
+            }
+
+            return op switch
+            {
+                "==" => left.Equals(right, StringComparison.OrdinalIgnoreCase),
+                "!=" => !left.Equals(right, StringComparison.OrdinalIgnoreCase),
+                _ => false
+            };
         }
 
         protected object? GetDynamicArgument(string key)
