@@ -155,6 +155,16 @@ namespace Jscription.Core.Commands
 
             return false;
         }
+
+        protected object? GetDynamicArgument(string key)
+        {
+            if (_rawArgs != null && _rawArgs.TryGetValue(key, out var rawValue))
+            {
+                return ResolveVariable(rawValue, _globalVariables);
+            }
+            var prop = this.GetType().GetProperty(key, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            return prop?.GetValue(this);
+        }
     }
 
     //==========================================================================================
@@ -276,35 +286,19 @@ namespace Jscription.Core.Commands
 
         public class Loop : CmdRoot
         {
-            public required object condition { get; set; }
+            public object? condition { get; set; }
             public List<JscriptionDoc.CommandInfo>? @do { get; set; }
 
             public override object? Run()
             {
-                if (_globalVariables == null)
-                    throw new Exception($"命令 [{CommandName}] 运行时丢失了上下文变量字典。");
-
+                if (_globalVariables == null) throw new Exception($"命令 [{CommandName}] 运行时丢失上下文。");
                 if (@do == null || @do.Count == 0) return null;
 
                 while (true)
                 {
-                    object? rawCondition = null;
+                    var currentCondition = GetDynamicArgument(nameof(condition));
 
-                    var fieldInfo = typeof(CmdRoot).GetField("_rawArgs", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    var rawArgs = fieldInfo?.GetValue(this) as Dictionary<string, object>;
-
-                    if (rawArgs != null)
-                    {
-                        var insensitiveArgs = new Dictionary<string, object>(rawArgs, StringComparer.OrdinalIgnoreCase);
-                        insensitiveArgs.TryGetValue("condition", out rawCondition);
-                    }
-
-                    rawCondition ??= condition;
-
-                    var methodInfo = typeof(CmdRoot).GetMethod("ResolveVariable", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    object? dynamicCondition = methodInfo?.Invoke(this, new object?[] { rawCondition, _globalVariables });
-
-                    if (!EvaluateCondition(dynamicCondition))
+                    if (!EvaluateCondition(currentCondition))
                     {
                         break;
                     }
@@ -312,15 +306,13 @@ namespace Jscription.Core.Commands
                     foreach (var cmdInfo in @do)
                     {
                         var subCmd = CommandRegistry.CreateCommand(cmdInfo.Command, cmdInfo.Arguments);
-                        if (subCmd == null) throw new Exception($"Loop 内部包含未知的命令类型: \"{cmdInfo.Command}\"");
+                        if (subCmd == null) throw new Exception($"Loop 内部包含未知命令: \"{cmdInfo.Command}\"");
 
                         string subCmdName = cmdInfo.Command ?? subCmd.GetType().Name;
                         subCmd.Initialize(cmdInfo.Arguments, subCmdName, _globalVariables, cmdInfo.Return);
-
                         subCmd.Execute();
                     }
                 }
-
                 return null;
             }
         }
