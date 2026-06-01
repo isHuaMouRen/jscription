@@ -69,39 +69,43 @@ namespace Jscription.Core.Commands
             if (rawValue is string strValue)
             {
                 strValue = strValue.Trim();
+                if (variables == null) return strValue;
 
                 if (strValue.StartsWith("$") && strValue.EndsWith("$") && strValue.Length > 2)
                 {
-                    string varName = strValue.Substring(1, strValue.Length - 2);
-                    if (variables != null && variables.TryGetValue(varName, out var varValue))
+                    if (strValue.IndexOf('$', 1) == strValue.Length - 1)
                     {
-                        return varValue;
-                    }
-                    throw new JscriptionVariableNotFoundException(varName);
-                }
-
-                if (variables != null)
-                {
-                    int startIndex = 0;
-                    while ((startIndex = strValue.IndexOf('$', startIndex)) != -1)
-                    {
-                        int endIndex = strValue.IndexOf('$', startIndex + 1);
-                        if (endIndex == -1) break;
-
-                        string varName = strValue.Substring(startIndex + 1, endIndex - startIndex - 1);
+                        string varName = strValue.Substring(1, strValue.Length - 2);
                         if (variables.TryGetValue(varName, out var varValue))
                         {
-                            string placeholder = $"${varName}$";
-                            strValue = strValue.Replace(placeholder, varValue?.ToString() ?? "");
-                            startIndex = 0;
+                            return varValue;
                         }
-                        else
-                        {
-                            throw new JscriptionVariableNotFoundException(varName);
-                        }
+                        throw new JscriptionVariableNotFoundException(varName);
                     }
-                    return strValue;
                 }
+
+                int startIndex = 0;
+                while ((startIndex = strValue.IndexOf('$', startIndex)) != -1)
+                {
+                    int endIndex = strValue.IndexOf('$', startIndex + 1);
+                    if (endIndex == -1) break;
+
+                    string varName = strValue.Substring(startIndex + 1, endIndex - startIndex - 1);
+
+                    if (variables.TryGetValue(varName, out var varValue))
+                    {
+                        string placeholder = $"${varName}$";
+                        strValue = strValue.Replace(placeholder, varValue?.ToString() ?? "");
+
+                        startIndex = 0;
+                    }
+                    else
+                    {
+                        throw new JscriptionVariableNotFoundException(varName);
+                    }
+                }
+
+                return strValue;
             }
 
             return rawValue;
