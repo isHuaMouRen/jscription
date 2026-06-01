@@ -1,0 +1,58 @@
+# File 系列命令
+
+[主页](/docs/home.md)
+
+## file.write
+
+写入文件
+
+|参数|类型|描述|
+|-|-|-|
+| `path` |string|文件路径|
+| `content` |string?|文件内容，如空则为仅创建文件（不写入任何内容）|
+
+## file.delete
+
+删除文件
+
+|参数|类型|描述|
+|-|-|-|
+| `path` |string|文件路径|
+
+## file.read
+
+读取文件
+
+|参数|类型|描述|
+|-|-|-|
+| `path` |string|文件路径|
+
+|返回值类型|描述|
+|-|-|
+|string|文件的内容|
+
+这是一个简单的示例，会读取位于 `C:\test.txt` 的文件并输出至命令行
+
+```json
+{
+    "name": "Demo",
+    "variables": {
+        "file-content": null
+    },
+    "commands": [
+        {
+            "command": "file.read",
+            "arguments": {
+                "path": "C:\\test.txt"
+            },
+            "return": "file-content"
+        },
+        {
+            "command": "console.printline",
+            "arguments": {
+                "message": "$file-content$"
+            }
+        }
+    ]
+}
+```
