@@ -50,7 +50,7 @@ namespace Jscription.Core.Exceptions
         public CmdRoot? Command { get; }
 
         public JscriptionRuntimeException(CmdRoot? command, string message, Exception innerException)
-            : base($"脚本在执行命令 [{command?.GetType().Name}] 时发生错误：{message}", innerException)
+            : base($"脚本在执行命令 [{command?.CommandName}] 时发生错误：{message}", innerException)
         {
             Command = command;
         }
