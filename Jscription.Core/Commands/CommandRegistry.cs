@@ -10,6 +10,7 @@
             { "file.delete", typeof(CmdFile.Delete) },
             { "file.read", typeof(CmdFile.Read) },
             { "variable.set", typeof(CmdVariable.Set) },
+            { "variable.get", typeof(CmdVariable.Get) },
             { "control.sleep", typeof(CmdControl.Sleep) },
             { "control.if", typeof(CmdControl.If) },
             { "control.loop", typeof(CmdControl.Loop) }
