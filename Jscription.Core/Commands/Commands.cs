@@ -248,7 +248,7 @@ namespace Jscription.Core.Commands
 
         public class If : CmdRoot
         {
-            public required object condition { get; set; }
+            public object? condition { get; set; }
 
             public List<JscriptionDoc.CommandInfo>? then { get; set; }
             public List<JscriptionDoc.CommandInfo>? @else { get; set; }//else为保留关键字，@以作为变量名
@@ -258,7 +258,9 @@ namespace Jscription.Core.Commands
                 if (_globalVariables == null)
                     throw new Exception($"命令 [{CommandName}] 运行时丢失了上下文变量字典。");
 
-                bool isTrue = EvaluateCondition(condition);
+                var currentCondition = GetDynamicArgument(nameof(condition));
+                bool isTrue = EvaluateCondition(currentCondition);
+
                 var targetCommands = isTrue ? then : @else;
 
                 if (targetCommands != null)
