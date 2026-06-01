@@ -13,15 +13,17 @@ namespace Jscription.Core.Commands
 
         public string CommandName { get; private set; } = "Unknown";
         public string? ReturnVarName { get; private set; }
+        public int LineNumber { get; private set; }
 
         public abstract object? Run();
 
-        public void Initialize(Dictionary<string, object>? args, string commandName, Dictionary<string, object> variables, string? returnVarName = null)
+        public void Initialize(Dictionary<string, object>? args, string commandName, Dictionary<string, object> variables, string? returnVarName = null, int lineNumber = 0)
         {
             this.CommandName = commandName;
             this._globalVariables = variables;
             this._rawArgs = args;
             this.ReturnVarName = returnVarName;
+            this.LineNumber = lineNumber;
         }
 
         public void Execute()
@@ -49,7 +51,8 @@ namespace Jscription.Core.Commands
                             throw new JscriptionInvalidArgumentsException(
                                 CommandName,
                                 prop.Name,
-                                $"参数类型不匹配。详情: {ex.Message}"
+                                $"参数类型不匹配。详情: {ex.Message}",
+                                this.LineNumber
                             );
                         }
                     }

@@ -14,14 +14,22 @@ namespace Jscription.Core.Utils
 
             try
             {
-                var doc = JsonConvert.DeserializeObject<JscriptionDoc>(docContent);
+                var jObject = Newtonsoft.Json.Linq.JObject.Parse(docContent);
+
+                var doc = jObject.ToObject<JscriptionDoc>();
                 if (doc == null)
                     throw new JscriptionParseException("JSON 反序列化结果为空，请检查脚本格式。");
+
+                var commandsArray = jObject["commands"] as Newtonsoft.Json.Linq.JArray;
+                if (commandsArray != null && doc.Commands != null)
+                {
+                    FillLineNumbers(commandsArray, doc.Commands);
+                }
+
                 return doc;
             }
             catch (JsonException ex)
             {
-                // 捕获 Newtonsoft.Json 的异常，包装成你自己的解析异常
                 throw new JscriptionParseException($"JSON 语法错误: {ex.Message}", ex);
             }
         }
@@ -34,21 +42,25 @@ namespace Jscription.Core.Utils
             if (doc.Commands == null) throw new JscriptionMissingFieldException("commands", "脚本不能没有命令列表，即使没有命令也要使用 \"commands\": []");
             
             var variables = doc.Variables ?? new Dictionary<string, object>();
-            
             var cmdList = new List<CmdRoot>();
-            foreach (var cmd in doc.Commands)
+
+            void ProcessCommandInfos(List<JscriptionDoc.CommandInfo> infos, List<CmdRoot> targetList)
             {
-                //转换命令
-                var parsedCmd = ConvertStringToCmd(cmd.Command, cmd.Arguments);
+                foreach (var cmd in infos)
+                {
+                    var parsedCmd = ConvertStringToCmd(cmd.Command, cmd.Arguments);
+                    if (parsedCmd == null)
+                        throw new JscriptionUnknownCommandException(cmd.Command);
 
-                if (parsedCmd == null)
-                    throw new JscriptionUnknownCommandException(cmd.Command);
+                    string cmdName = cmd.Command ?? parsedCmd.GetType().Name;
 
-                string cmdName = cmd.Command ?? parsedCmd.GetType().Name;
-                parsedCmd.Initialize(cmd.Arguments, cmdName, variables, cmd.Return);
-
-                cmdList.Add(parsedCmd);
+                    //注入LineNumber!!!
+                    parsedCmd.Initialize(cmd.Arguments, cmdName, variables, cmd.Return, cmd.LineNumber);
+                    targetList.Add(parsedCmd);
+                }
             }
+
+            ProcessCommandInfos(doc.Commands, cmdList);
 
             return new JscriptionExecutInfo
             {
@@ -59,5 +71,30 @@ namespace Jscription.Core.Utils
 
         private static CmdRoot? ConvertStringToCmd(string? cmd, Dictionary<string, object>? args)
             => CommandRegistry.CreateCommand(cmd, args);
+
+        private static void FillLineNumbers(Newtonsoft.Json.Linq.JArray? jArray, List<JscriptionDoc.CommandInfo> cmdList)
+        {
+            if (jArray == null) return;
+
+            for (int i = 0; i < jArray.Count && i < cmdList.Count; i++)
+            {
+                var item = jArray[i] as Newtonsoft.Json.Linq.JObject;
+                if (item == null) continue;
+
+                var lineInfo = item as Newtonsoft.Json.IJsonLineInfo;
+                if (lineInfo != null && lineInfo.HasLineInfo())
+                {
+                    cmdList[i].LineNumber = lineInfo.LineNumber;
+                }
+
+                if (item.TryGetValue("arguments", out var argsToken) && argsToken is Newtonsoft.Json.Linq.JObject argsObj)
+                {
+                    if (argsObj.TryGetValue("then", out var thenToken) && thenToken is Newtonsoft.Json.Linq.JArray thenArray && cmdList[i].Arguments != null)
+                    {
+                        //no anything...
+                    }
+                }
+            }
+        }
     }
 }

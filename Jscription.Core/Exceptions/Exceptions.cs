@@ -36,8 +36,8 @@ namespace Jscription.Core.Exceptions
         public string CommandName { get; }
         public string ArgumentKey { get; }
 
-        public JscriptionInvalidArgumentsException(string commandName, string argumentKey, string message)
-            : base($"命令 [{commandName}] 的参数 [{argumentKey}] 错误: {message}")
+        public JscriptionInvalidArgumentsException(string commandName, string argumentKey, string message, int lineNumber = 0)
+            : base($"命令 [{commandName}](line: {lineNumber}) 的参数 [{argumentKey}] 错误: {message}")
         {
             CommandName = commandName;
             ArgumentKey = argumentKey;
@@ -50,7 +50,7 @@ namespace Jscription.Core.Exceptions
         public CmdRoot? Command { get; }
 
         public JscriptionRuntimeException(CmdRoot? command, string message, Exception innerException)
-            : base($"脚本在执行命令 [{command?.CommandName}] 时发生错误：{message}", innerException)
+            : base($"脚本在执行命令 [{command?.CommandName}](line:{command?.LineNumber}) 时发生错误：{message}", innerException)
         {
             Command = command;
         }

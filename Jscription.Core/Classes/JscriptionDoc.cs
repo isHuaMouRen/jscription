@@ -24,6 +24,11 @@ namespace Jscription.Core.Classes
 
             [JsonProperty("return")]
             public string? Return { get; set; }
+
+            
+            //记录行号
+            [JsonIgnore]
+            public int LineNumber { get; set; }
         }
     }
 
