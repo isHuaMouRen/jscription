@@ -244,7 +244,12 @@ namespace Jscription.Core.Commands
                 if (_globalVariables == null)
                     throw new Exception($"命令 [{CommandName}] 运行时丢失了上下文变量字典。");
 
-                return _globalVariables[varName];
+                if (_globalVariables.TryGetValue(varName, out var value))
+                {
+                    return value;
+                }
+
+                throw new JscriptionVariableNotFoundException(varName);
             }
         }
     }
@@ -290,7 +295,19 @@ namespace Jscription.Core.Commands
 
                         string subCmdName = cmdInfo.Command ?? subCmd.GetType().Name;
                         subCmd.Initialize(cmdInfo.Arguments, subCmdName, _globalVariables, cmdInfo.Return);
-                        subCmd.Execute();
+
+                        try
+                        {
+                            subCmd.Execute();
+                        }
+                        catch (JscriptionParseException)
+                        {
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new JscriptionRuntimeException(subCmd, ex.Message, ex);
+                        }
                     }
                 }
 
