@@ -1,6 +1,6 @@
 # Jscription
 
-**Jscription** 可以使你的Json可运行，并且编译为一个可执行程序
+**Jscription** 是一个基于 Json 的轻量级数据数据驱动脚本引擎
 
 ## 示例
 
