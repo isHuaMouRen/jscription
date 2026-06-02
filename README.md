@@ -13,8 +13,7 @@
     "name": "Demo",
     "commands": [
         {
-            "command": "console.print",
-            "arguments": {
+            "console.print": {
                 "message": "Hello world!"
             }
         }
@@ -25,7 +24,7 @@
 然后丢给 **Jscription** 来执行这个Json:
 
 ```bash
-Jscription.Runner.exe --source source.json
+Jscription.Runner.exe run --source source.json
 ```
 
 就可以运行了！
