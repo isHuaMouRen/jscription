@@ -1,48 +1,54 @@
-# Jscription Runner 用法
+# Jscription Runner 教程
 
-[主页](/docs/home.md)
+[主页](https://www.google.com/search?q=/docs/home.md)
 
-## 什么是 Jscription Runner?
+`Jscription Runner` 是用于执行 Jscription 的程序。由于 Jscription 核心库本身不提供直接的独立运行环境，而是通过 C# API 的形式提供核心功能，因此我们开发了 `Jscription Runner CLI` （命令行工具），方便用户直接在终端中与 Jscription 进行交互和运行脚本。
 
-`Jscription Runner` 是运行 Jscription 的载体， Jscription 本身不可以直接运行 Jscription 脚本。但其内部提供了对应的C#方法，你可以通过引用类库的方法来调用。为了平常的使用，便编写了 `Jscription Runner CLI` ，用户可直接通过命令行来与 Jscription 交互（运行脚本等...）
+---
 
-## 命令
+## 基础命令
 
-(命令开头的 `jscription` 请替换为你的实际可执行文件名)
+> 💡 **提示**：下文示例中的 `jscription` 命令，请根据您实际的可执行文件名（如 `Jscription.Runner.win-x64.exe` 等 ）进行替换。
 
-### Run
+### 1. 运行脚本 ( `run` )
 
-#### 调用
+执行指定的 Jscription 脚本文件。
+
+* **命令格式**
 
 ```bash
 jscription run [参数]
+
 ```
 
-#### 用法
+* **参数说明**
+* `run --source <文件路径>.json`：立即执行指定路径下的 JSON 脚本文件。
 
-* `run --source <文件路径>.json`: 立即执行指定的脚本
+### 2. 获取帮助 ( `help` )
 
-### Help
+查看命令的帮助信息和使用说明。
 
-#### 调用
+* **命令格式**
 
 ```bash
 jscription help [参数]
+
 ```
 
-#### 用法
+* **参数说明**
+* `help`：显示所有可用命令及其简要概述。
+* `help <命令名>`：显示指定命令的详细用法和参数说明。
 
-* `help`: 显示所有命令及其简述
-* `help <命令名>`: 显示某个命令的用法
+### 3. 查看版本 ( `version` )
 
-### Version
+查看当前安装的工具版本信息。
 
-#### 调用
+* **命令格式**
 
 ```bash
 jscription version
+
 ```
 
-#### 用法
-
-* `version`: 直接输出版本信息
+* **参数说明**
+* `version`：直接在终端输出当前可执行文件的版本号。
