@@ -2,6 +2,9 @@
 using Jscription.Core.Commands;
 using Jscription.Core.Exceptions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 
 namespace Jscription.Core.Utils
 {
@@ -14,16 +17,19 @@ namespace Jscription.Core.Utils
 
             try
             {
-                var jObject = Newtonsoft.Json.Linq.JObject.Parse(docContent);
+                var jObject = JObject.Parse(docContent);
 
-                var doc = jObject.ToObject<JscriptionDoc>();
-                if (doc == null)
-                    throw new JscriptionParseException("JSON 反序列化结果为空，请检查脚本格式。");
-
-                var commandsArray = jObject["commands"] as Newtonsoft.Json.Linq.JArray;
-                if (commandsArray != null && doc.Commands != null)
+                var doc = new JscriptionDoc
                 {
-                    FillLineNumbers(commandsArray, doc.Commands);
+                    Name = jObject["name"]?.ToString(),
+                    Variables = jObject["variables"]?.ToObject<Dictionary<string, object>>(),
+                    Commands = new List<JscriptionDoc.CommandInfo>()
+                };
+
+                // 解析核心的 commands 数组
+                if (jObject["commands"] is JArray commandsArray)
+                {
+                    doc.Commands = ParseCommandsArray(commandsArray);
                 }
 
                 return doc;
@@ -34,13 +40,87 @@ namespace Jscription.Core.Utils
             }
         }
 
+        /// <summary>
+        /// 支持新旧语法双重嗅探的通用解析方法
+        /// </summary>
+        private static List<JscriptionDoc.CommandInfo> ParseCommandsArray(JArray jArray)
+        {
+            var resultList = new List<JscriptionDoc.CommandInfo>();
+
+            foreach (var item in jArray)
+            {
+                if (item is not JObject cmdOuterObj) continue;
+
+                var cmdInfo = new JscriptionDoc.CommandInfo();
+
+                if (cmdOuterObj is IJsonLineInfo lineInfo && lineInfo.HasLineInfo())
+                {
+                    cmdInfo.LineNumber = lineInfo.LineNumber;
+                }
+
+                JObject? argsToken = null;
+
+                //旧语法兼容
+                if (cmdOuterObj.ContainsKey("command"))
+                {
+                    cmdInfo.Command = cmdOuterObj["command"]?.ToString();
+                    cmdInfo.Return = cmdOuterObj["return"]?.ToString();
+                    argsToken = cmdOuterObj["arguments"] as JObject;
+                }
+                else//新语法
+                {
+                    foreach (var property in cmdOuterObj.Properties())
+                    {
+                        if (property.Name.Equals("return", StringComparison.OrdinalIgnoreCase))
+                        {
+                            cmdInfo.Return = property.Value.ToString();
+                        }
+                        else
+                        {
+                            cmdInfo.Command = property.Name;
+                            argsToken = property.Value as JObject;
+                        }
+                    }
+                }
+
+                if (cmdInfo.Command != null)
+                {
+                    cmdInfo.Arguments = new Dictionary<string, object>();
+
+                    if (argsToken != null)
+                    {
+                        foreach (var argProp in argsToken.Properties())
+                        {
+                            string argKey = argProp.Name;
+
+                            if ((argKey.Equals("then", StringComparison.OrdinalIgnoreCase) ||
+                                 argKey.Equals("else", StringComparison.OrdinalIgnoreCase) ||
+                                 argKey.Equals("do", StringComparison.OrdinalIgnoreCase))
+                                && argProp.Value is JArray subArray)
+                            {
+                                cmdInfo.Arguments[argKey] = ParseCommandsArray(subArray);
+                            }
+                            else
+                            {
+                                cmdInfo.Arguments[argKey] = argProp.Value.ToObject<object>()!;
+                            }
+                        }
+                    }
+
+                    resultList.Add(cmdInfo);
+                }
+            }
+
+            return resultList;
+        }
+
         public static JscriptionExecutInfo AnalysisDoc(JscriptionDoc? doc)
         {
             //基础检查
             if (doc == null) throw new Exception("脚本不能为空");
             if (doc.Name == null) throw new JscriptionMissingFieldException("name", "脚本名字不能为空，请使用 \"name\" 属性");
             if (doc.Commands == null) throw new JscriptionMissingFieldException("commands", "脚本不能没有命令列表，即使没有命令也要使用 \"commands\": []");
-            
+
             var variables = doc.Variables ?? new Dictionary<string, object>();
             var cmdList = new List<CmdRoot>();
 
@@ -71,30 +151,5 @@ namespace Jscription.Core.Utils
 
         private static CmdRoot? ConvertStringToCmd(string? cmd, Dictionary<string, object>? args)
             => CommandRegistry.CreateCommand(cmd, args);
-
-        private static void FillLineNumbers(Newtonsoft.Json.Linq.JArray? jArray, List<JscriptionDoc.CommandInfo> cmdList)
-        {
-            if (jArray == null) return;
-
-            for (int i = 0; i < jArray.Count && i < cmdList.Count; i++)
-            {
-                var item = jArray[i] as Newtonsoft.Json.Linq.JObject;
-                if (item == null) continue;
-
-                var lineInfo = item as Newtonsoft.Json.IJsonLineInfo;
-                if (lineInfo != null && lineInfo.HasLineInfo())
-                {
-                    cmdList[i].LineNumber = lineInfo.LineNumber;
-                }
-
-                if (item.TryGetValue("arguments", out var argsToken) && argsToken is Newtonsoft.Json.Linq.JObject argsObj)
-                {
-                    if (argsObj.TryGetValue("then", out var thenToken) && thenToken is Newtonsoft.Json.Linq.JArray thenArray && cmdList[i].Arguments != null)
-                    {
-                        //no anything...
-                    }
-                }
-            }
-        }
     }
 }

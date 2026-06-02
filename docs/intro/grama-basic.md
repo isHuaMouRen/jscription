@@ -15,20 +15,17 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
     "name": "Demo",
     "commands": [
         {
-            "command": "console.printline",
-            "arguments": {
+            "console.printline": {
                 "message": "Hello world!"
             }
         }
     ]
 }
-
 ```
 
 * **`name`**: 脚本的唯一标识名称。
 * **`commands`**: 命令执行队列。队列内部的命令严格按照**由上至下**的顺序串行执行。
-* **`command`**: 待执行的命令名称（例如 `console.printline`）。
-* **`arguments`**: 命令的参数上下文，用于为当前命令提供具体的数据输入。
+* **`<命令名称>`**: 待执行的命令名称（例如 `console.printline`）。
 * **`<命令特定属性>`**: 由具体命令定义的强类型属性。例如 `console.printline` 接收 `message` 属性，引擎在运行时会动态将该属性的值输出至控制台。
 
 ---
@@ -45,14 +42,12 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
     },
     "commands": [
         {
-            "command": "console.printline",
-            "arguments": {
+            "console.printline": {
                 "message": "$text$"
             }
         }
     ]
 }
-
 ```
 
 #### 语法规则
@@ -83,21 +78,18 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
     },
     "commands": [
         {
-            "command": "file.read",
-            "arguments": {
+            "file.read": {
                 "path": "C:\\test.txt"
             },
             "return": "file-content"
         },
         {
-            "command": "console.printline",
-            "arguments": {
+            "console.printline": {
                 "message": "$file-content$"
             }
         }
     ]
 }
-
 ```
 
 > **提示**：在 JSON 字符串中表示文件路径时，反斜杠 `\` 需要进行转义，写作 `\\` 。
