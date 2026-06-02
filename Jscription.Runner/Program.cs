@@ -1,87 +1,49 @@
 ﻿using System;
-using System.IO;
-using Jscription.Core.Utils;
-using Jscription.Core.Exceptions;
+using System.Collections.Generic;
 using Jscription.Runner.Classes;
+using Jscription.Runner.Commands;
 
 namespace Jscription.Runner
 {
     internal class Program
     {
+        // 注册所有可用的 CLI 命令
+        public static readonly Dictionary<string, ICliCommand> _cliRegistry = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "run", new CommandRun() },
+            { "version", new CommandVersion() },
+            { "help", new CommandHelp() }
+        };
+
         static int Main(string[] args)
         {
-            //欢迎信息
-            var welcomeMessage = $"""
-                Welcome to Jscription Runner {Global.Version}
+            Console.WriteLine($"Welcome to Jscription Runner {Global.Version}\n");
 
-                """;
-            Console.WriteLine(welcomeMessage);
-
-
-            string? sourcePath = null;
-
-            try
+            if (args.Length == 0)
             {
-                for (int i = 0; i < args.Length; i++)
-                {
-                    switch (args[i])
-                    {
-                        case "--source":
-                            if (i + 1 < args.Length)
-                            {
-                                sourcePath = args[i + 1];
-                                i++;
-                            }
-                            else
-                            {
-                                LogError("错误: --source 参数后面缺少脚本文件路径。");
-                                return 1;
-                            }
-                            break;
-                    }
-                }
-
-                //进入执行逻辑
-                if (!string.IsNullOrEmpty(sourcePath))
-                {
-                    if (!File.Exists(sourcePath))
-                    {
-                        LogError($"错误: 找不到指定的脚本文件 -> \"{Path.GetFullPath(sourcePath)}\"");
-                        return 1;
-                    }
-
-                    // 解析与执行
-                    var jsonContent = File.ReadAllText(sourcePath);
-                    var jscriptionDoc = JscriptionReader.ReadDoc(jsonContent);
-                    var jscriptionExecuteInfo = JscriptionReader.AnalysisDoc(jscriptionDoc);
-
-                    // 运行
-                    var executer = new JscriptionExecuter { ExecuteInfo = jscriptionExecuteInfo };
-                    executer.Run();
-                }
-
-                
+                _cliRegistry["help"].Execute([]);
+                return 0;
             }
-            catch (JscriptionParseException ex)
+
+            //提取第一个参数作为命令
+            string primaryCommand = args[0];
+
+            if (_cliRegistry.TryGetValue(primaryCommand, out var command))
             {
-                LogError($"[Jscription 脚本错误] {ex.Message}");
+                string[] subArgs = new string[args.Length - 1];
+                Array.Copy(args, 1, subArgs, 0, subArgs.Length);
+
+                return command.Execute(subArgs);
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"错误: 未知的指令 \"{primaryCommand}\"");
+                Console.ResetColor();
+                Console.WriteLine();
+                _cliRegistry["help"].Execute([]);
                 return 1;
             }
-            catch (Exception ex)
-            {
-                LogError($"[运行时未知崩溃] {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                return 1;
-            }
-
-            return 0;
-        }
-
-        private static void LogError(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
-            Console.ResetColor();
         }
     }
 }
