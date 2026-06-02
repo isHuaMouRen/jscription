@@ -8,3 +8,4 @@
   + [Control 系列命令](/docs/intro/command/control.md)
   + [File 系列命令](/docs/intro/command/file.md)
   + [Variable 系列命令](/docs/intro/command/variable.md)
+ + [Jscription Runner 教程](/docs/intro/runner-usage.md)
