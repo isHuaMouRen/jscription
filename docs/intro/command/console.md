@@ -27,3 +27,30 @@ Console 系列命令用于控制控制台
 |返回值类型|描述|
 |-|-|
 | `string` |用户输入的内容|
+
+## console.setcolor
+
+设置控制台前景色
+
+|参数|类型|描述|
+|-|-|-|
+| `color` |string|目标颜色，仅支持输入以下颜色。大小写不敏感|
+
+|颜色|
+|-|
+|Black|
+|DarkBlue|
+|DarkGreen|
+|DarkCyan|
+|DarkRed|
+|DarkMagenta|
+|DarkYellow|
+|Gray|
+|DarkGray|
+|Blue|
+|Green|
+|Cyan|
+|Red|
+|Magenta|
+|Yellow|
+|White|
