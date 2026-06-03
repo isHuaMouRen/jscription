@@ -43,5 +43,13 @@ namespace Jscription.Core.Commands
                 return null;
             }
         }
+
+        public class GetColor : CmdRoot
+        {
+            public override object? Run()
+            {
+                return ((ConsoleColor)Console.ForegroundColor).ToString();
+            }
+        }
     }
 }

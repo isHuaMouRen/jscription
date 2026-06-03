@@ -8,6 +8,7 @@
             { "console.writeline", typeof(CmdConsole.WriteLine) },
             { "console.readline", typeof(CmdConsole.ReadLine) },
             { "console.setcolor", typeof(CmdConsole.SetColor) },
+            { "console.getcolor", typeof(CmdConsole.GetColor) },
             { "file.write", typeof(CmdFile.Write) },
             { "file.delete", typeof(CmdFile.Delete) },
             { "file.read", typeof(CmdFile.Read) },

@@ -54,3 +54,11 @@ Console 系列命令用于控制控制台
 |Magenta|
 |Yellow|
 |White|
+
+## console.getcolor
+
+获得当前前景色
+
+|返回值类型|描述|
+|-|-|
+| `string` |当前颜色，返回的内容见 `console.setcolor` 的颜色表|
