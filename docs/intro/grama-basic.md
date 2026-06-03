@@ -15,7 +15,7 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
     "name": "Demo",
     "commands": [
         {
-            "console.printline": {
+            "console.writeline": {
                 "message": "Hello world!"
             }
         }
@@ -25,8 +25,8 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
 
 * **`name`**: 脚本的唯一标识名称。
 * **`commands`**: 命令执行队列。队列内部的命令严格按照**由上至下**的顺序串行执行。
-* **`<命令名称>`**: 待执行的命令名称（例如 `console.printline`）。
-* **`<命令特定属性>`**: 由具体命令定义的强类型属性。例如 `console.printline` 接收 `message` 属性，引擎在运行时会动态将该属性的值输出至控制台。
+* **`<命令名称>`**: 待执行的命令名称（例如 `console.writeline`）。
+* **`<命令特定属性>`**: 由具体命令定义的强类型属性。例如 `console.writeline` 接收 `message` 属性，引擎在运行时会动态将该属性的值输出至控制台。
 
 ---
 
@@ -42,7 +42,7 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
     },
     "commands": [
         {
-            "console.printline": {
+            "console.writeline": {
                 "message": "$text$"
             }
         }
@@ -68,7 +68,7 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
 
 ### 返回值
 
-并非所有命令都只执行无返回值的操作（如 `console.printline` ）。某些命令（如文件读取 `file.read` ）会产生输出数据，此时需要使用 **`return`** 属性将结果捕获并写入变量。
+并非所有命令都只执行无返回值的操作（如 `console.writeline` ）。某些命令（如文件读取 `file.read` ）会产生输出数据，此时需要使用 **`return`** 属性将结果捕获并写入变量。
 
 ```json
 {
@@ -84,7 +84,7 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
             "return": "file-content"
         },
         {
-            "console.printline": {
+            "console.writeline": {
                 "message": "$file-content$"
             }
         }
@@ -98,7 +98,7 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
 
 1. **变量预声明**：在根节点 `variables` 中初始化一个名为 `file-content` 的空变量（赋值为 `null`）。
 2. **捕获返回值**：执行 `file.read` 命令，读取指定路径的文件。通过 `"return": "file-content"` 属性，将读取到的文本内容赋值给 `file-content` 变量。
-3. **变量复用**：随后的 `console.printline` 命令引用 `$file-content$`，将文件内容打印至控制台。
+3. **变量复用**：随后的 `console.writeline` 命令引用 `$file-content$`，将文件内容打印至控制台。
 
 #### 控制台预期输出：
 

@@ -48,7 +48,7 @@
             "return": "file-content"
         },
         {
-            "command": "console.printline",
+            "command": "console.writeline",
             "arguments": {
                 "message": "$file-content$"
             }

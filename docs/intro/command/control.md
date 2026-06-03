@@ -37,7 +37,7 @@ Control 系列命令用于命令的流程控制
                 "condition": "$test-var$ == 1",
                 "then": [
                     {
-                        "command": "console.printline",
+                        "command": "console.writeline",
                         "arguments": {
                             "message": "test-var的值是1"
                         }
@@ -45,7 +45,7 @@ Control 系列命令用于命令的流程控制
                 ],
                 "else": [
                     {
-                        "command": "console.printline",
+                        "command": "console.writeline",
                         "arguments": {
                             "message": "test-var的值不是1"
                         }

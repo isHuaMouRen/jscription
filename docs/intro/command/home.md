@@ -27,7 +27,7 @@
 * `return`: 如果此命令有返回值，可通过此属性传出到变量
 
 > [!note]
-> **提示**: 命令名是不区分大小写的。因此你可以将 `console.printline` 拼写为 `Console.PrintLine` ，甚至 `cOnsoLE.pRInTliNe` ，不过还是推荐全小写，最稳定，最美观
+> **提示**: 命令名是不区分大小写的。因此你可以将 `console.writeline` 拼写为 `Console.WriteLine` ，甚至 `cOnsoLE.wRiTelIne` ，不过还是推荐全小写，最稳定，最美观
 
 ## 全部命令
 

@@ -13,7 +13,7 @@
     "name": "Demo",
     "commands": [
         {
-            "console.print": {
+            "console.write": {
                 "message": "Hello world!"
             }
         }
