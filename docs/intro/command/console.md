@@ -4,7 +4,7 @@
 
 Console 系列命令用于控制控制台
 
-## console.print
+## console.write
 
 在控制台打印文字
 
@@ -12,7 +12,7 @@ Console 系列命令用于控制控制台
 |-|-|-|
 | `message` |string?|输出的内容|
 
-## console.printline
+## console.writeline
 
 在控制台打印一行文字（即在输出内容后方添加换行符）
 

@@ -6,14 +6,14 @@ namespace Jscription.Core.Commands
 {
     public class CmdConsole
     {
-        public class Print : CmdRoot
+        public class Write : CmdRoot
         {
             public string? Message { get; set; }
 
             public override object? Run() { Console.Write(Message); return null; }
         }
 
-        public class PrintLine : CmdRoot
+        public class WriteLine : CmdRoot
         {
             public string? Message { get; set; }
 

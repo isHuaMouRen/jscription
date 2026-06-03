@@ -4,8 +4,8 @@
     {
         private static readonly Dictionary<string, Type> _registry = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "console.print", typeof(CmdConsole.Print) },
-            { "console.printline", typeof(CmdConsole.PrintLine) },
+            { "console.write", typeof(CmdConsole.Write) },
+            { "console.writeline", typeof(CmdConsole.WriteLine) },
             { "file.write", typeof(CmdFile.Write) },
             { "file.delete", typeof(CmdFile.Delete) },
             { "file.read", typeof(CmdFile.Read) },
