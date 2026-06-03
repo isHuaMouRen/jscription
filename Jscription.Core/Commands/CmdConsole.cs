@@ -19,5 +19,13 @@ namespace Jscription.Core.Commands
 
             public override object? Run() { Console.WriteLine(Message); return null; }
         }
+
+        public class ReadLine : CmdRoot
+        {
+            public override object? Run()
+            {
+                return Console.ReadLine();
+            }
+        }
     }
 }
