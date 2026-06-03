@@ -39,11 +39,18 @@ namespace Jscription.Core.Commands
                     {
                         try
                         {
-                            var resolvedValue = ResolveVariable(rawValue, _globalVariables);
+                            if (rawValue is List<CmdRoot> compiledBlock)
+                            {
+                                prop.SetValue(this, compiledBlock);
+                            }
+                            else
+                            {
+                                var resolvedValue = ResolveVariable(rawValue, _globalVariables);
 
-                            var token = Newtonsoft.Json.Linq.JToken.FromObject(resolvedValue);
-                            var convertedValue = token.ToObject(prop.PropertyType);
-                            prop.SetValue(this, convertedValue);
+                                var token = Newtonsoft.Json.Linq.JToken.FromObject(resolvedValue);
+                                var convertedValue = token.ToObject(prop.PropertyType);
+                                prop.SetValue(this, convertedValue);
+                            }
                         }
                         catch (JscriptionVariableNotFoundException) { throw; }
                         catch (Exception ex)
@@ -275,8 +282,8 @@ namespace Jscription.Core.Commands
         {
             public object? condition { get; set; }
 
-            public List<JscriptionDoc.CommandInfo>? then { get; set; }
-            public List<JscriptionDoc.CommandInfo>? @else { get; set; }//else为保留关键字，@以作为变量名
+            public List<CmdRoot>? then { get; set; }
+            public List<CmdRoot>? @else { get; set; }
 
             public override object? Run()
             {
@@ -290,27 +297,9 @@ namespace Jscription.Core.Commands
 
                 if (targetCommands != null)
                 {
-                    foreach (var cmdInfo in targetCommands)
+                    foreach (var subCmd in targetCommands)
                     {
-                        var subCmd = CommandRegistry.CreateCommand(cmdInfo.Command, cmdInfo.Arguments);
-                        if (subCmd == null)
-                            throw new Exception($"If 内部包含未知的命令类型: \"{cmdInfo.Command}\"");
-
-                        string subCmdName = cmdInfo.Command ?? subCmd.GetType().Name;
-                        subCmd.Initialize(cmdInfo.Arguments, subCmdName, _globalVariables, cmdInfo.Return);
-
-                        try
-                        {
-                            subCmd.Execute();
-                        }
-                        catch (JscriptionParseException)
-                        {
-                            throw;
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new JscriptionRuntimeException(subCmd, ex.Message, ex);
-                        }
+                        subCmd.Execute();
                     }
                 }
 
@@ -321,7 +310,8 @@ namespace Jscription.Core.Commands
         public class Loop : CmdRoot
         {
             public object? condition { get; set; }
-            public List<JscriptionDoc.CommandInfo>? @do { get; set; }
+
+            public List<CmdRoot>? @do { get; set; }
 
             public override object? Run()
             {
@@ -337,13 +327,8 @@ namespace Jscription.Core.Commands
                         break;
                     }
 
-                    foreach (var cmdInfo in @do)
+                    foreach (var subCmd in @do)
                     {
-                        var subCmd = CommandRegistry.CreateCommand(cmdInfo.Command, cmdInfo.Arguments);
-                        if (subCmd == null) throw new Exception($"Loop 内部包含未知命令: \"{cmdInfo.Command}\"");
-
-                        string subCmdName = cmdInfo.Command ?? subCmd.GetType().Name;
-                        subCmd.Initialize(cmdInfo.Arguments, subCmdName, _globalVariables, cmdInfo.Return);
                         subCmd.Execute();
                     }
                 }

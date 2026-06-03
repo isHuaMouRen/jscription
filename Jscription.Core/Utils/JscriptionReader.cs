@@ -93,17 +93,7 @@ namespace Jscription.Core.Utils
                         {
                             string argKey = argProp.Name;
 
-                            if ((argKey.Equals("then", StringComparison.OrdinalIgnoreCase) ||
-                                 argKey.Equals("else", StringComparison.OrdinalIgnoreCase) ||
-                                 argKey.Equals("do", StringComparison.OrdinalIgnoreCase))
-                                && argProp.Value is JArray subArray)
-                            {
-                                cmdInfo.Arguments[argKey] = ParseCommandsArray(subArray);
-                            }
-                            else
-                            {
-                                cmdInfo.Arguments[argKey] = argProp.Value.ToObject<object>()!;
-                            }
+                            cmdInfo.Arguments[argKey] = argProp.Value.ToObject<object>()!;
                         }
                     }
 
@@ -122,10 +112,12 @@ namespace Jscription.Core.Utils
             if (doc.Commands == null) throw new JscriptionMissingFieldException("commands", "脚本不能没有命令列表，即使没有命令也要使用 \"commands\": []");
 
             var variables = doc.Variables ?? new Dictionary<string, object>();
-            var cmdList = new List<CmdRoot>();
 
-            void ProcessCommandInfos(List<JscriptionDoc.CommandInfo> infos, List<CmdRoot> targetList)
+            // 递归编译方法
+            List<CmdRoot> CompileCommandInfos(List<JscriptionDoc.CommandInfo> infos)
             {
+                var compiledList = new List<CmdRoot>();
+
                 foreach (var cmd in infos)
                 {
                     var parsedCmd = ConvertStringToCmd(cmd.Command, cmd.Arguments);
@@ -134,18 +126,47 @@ namespace Jscription.Core.Utils
 
                     string cmdName = cmd.Command ?? parsedCmd.GetType().Name;
 
-                    //注入LineNumber!!!
+                    if (cmd.Arguments != null)
+                    {
+                        var keysToConvert = new[] { "then", "else", "do" };
+                        foreach (var key in keysToConvert)
+                        {
+                            if (cmd.Arguments.TryGetValue(key, out var rawValue) && rawValue != null)
+                            {
+                                List<JscriptionDoc.CommandInfo>? subCommandInfos = null;
+
+                                if (rawValue is List<JscriptionDoc.CommandInfo> list)
+                                {
+                                    subCommandInfos = list;
+                                }
+                                else if (rawValue is JArray jArray)
+                                {
+                                    subCommandInfos = ParseCommandsArray(jArray);
+                                }
+
+                                if (subCommandInfos != null)
+                                {
+                                    List<CmdRoot> subCompiledCmds = CompileCommandInfos(subCommandInfos);
+                                    cmd.Arguments[key] = subCompiledCmds;
+                                }
+                            }
+                        }
+                    }
+
+                    // 注入 LineNumber 上下文变量
                     parsedCmd.Initialize(cmd.Arguments, cmdName, variables, cmd.Return, cmd.LineNumber);
-                    targetList.Add(parsedCmd);
+                    compiledList.Add(parsedCmd);
                 }
+
+                return compiledList;
             }
 
-            ProcessCommandInfos(doc.Commands, cmdList);
+            var rootCommands = CompileCommandInfos(doc.Commands);
 
             return new JscriptionExecutInfo
             {
                 Name = doc.Name,
-                Commands = cmdList
+                Commands = rootCommands
             };
         }
 
