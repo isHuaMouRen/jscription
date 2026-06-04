@@ -68,7 +68,9 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
 
 ### 返回值
 
-并非所有命令都只执行无返回值的操作（如 `console.writeline` ）。某些命令（如文件读取 `file.read` ）会产生输出数据，此时需要将具有返回值的命令写到其他命令的参数中。以便使用返回的内容
+并非所有命令都只执行无返回值的操作（如 `console.writeline` ）。某些命令（如文件读取 `file.read` ）会产生输出数据
+
+#### 方式一
 
 ```json
 {
@@ -89,17 +91,38 @@ Jscription 采用声明式的 JSON 格式来编排业务逻辑。
 
 > **提示**：在 JSON 字符串中表示文件路径时，反斜杠 `\` 需要进行转义，写作 `\\` 。
 
-#### 执行流程解析：
+##### 执行流程解析：
 
 1. **执行message参数内的file.read** 读取位于 `C:\test.txt` 的文件，并返回
 2. **捕获返回值**：`console.writeline` 的 `message` 参数会采用 `file.read` 返回的结果。
 3. **执行console.writeline**: `console.writeline` 会将从 `file.read` 命令得到的文件内容打印到控制台内
 
-#### 控制台预期输出：
+#### 方式二
 
-```text
-Welcome to Jscription Runner 1.0.0-Indev.2 (运行时版本信息)
-
-This is an ordinary txt document. The file name is "test.txt".
-
+```json
+{
+    "name": "Demo",
+    "variables": {
+        "file-content": null
+    },
+    "commands": [
+        {
+            "file.read": {
+                "path": "C:\\test.txt"
+            },
+            "return": "file-content"
+        },
+        {
+            "console.writeline": {
+                "message": "$file-content$"
+            }
+        }
+    ]
+}
 ```
+
+##### 执行流程解析：
+
+1. **变量预声明**：在根节点 `variables` 中初始化一个名为 `file-content` 的空变量（赋值为 `null`）。
+2. **捕获返回值**：执行 `file.read` 命令，读取指定路径的文件。通过 `"return": "file-content"` 属性，将读取到的文本内容赋值给 `file-content` 变量。
+3. **变量复用**：随后的 `console.writeline` 命令引用 `$file-content$`，将文件内容打印至控制台。
