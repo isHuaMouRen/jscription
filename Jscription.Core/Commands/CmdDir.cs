@@ -16,5 +16,21 @@ namespace Jscription.Core.Commands
                 return null;
             }
         }
+
+        public class Delete : CmdRoot
+        {
+            public required string path { get; set; }
+            public bool? recursive { get; set; }
+
+            public override object? Run()
+            {
+                if (recursive != null)
+                    Directory.Delete(path, (bool)recursive);
+                else
+                    Directory.Delete(path);
+
+                return null;
+            }
+        }
     }
 }

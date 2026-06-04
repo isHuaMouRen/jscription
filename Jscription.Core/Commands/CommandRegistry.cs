@@ -15,6 +15,7 @@
             { "control.loop", typeof(CmdControl.Loop) },
 
             { "dir.create", typeof(CmdDir.Create) },
+            { "dir.delete", typeof(CmdDir.Delete) },
 
             { "file.write", typeof(CmdFile.Write) },
             { "file.delete", typeof(CmdFile.Delete) },
