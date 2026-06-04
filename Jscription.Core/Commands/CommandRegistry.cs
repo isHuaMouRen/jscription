@@ -16,6 +16,7 @@
 
             { "dir.create", typeof(CmdDir.Create) },
             { "dir.delete", typeof(CmdDir.Delete) },
+            { "dir.exists", typeof(CmdDir.Exists) },
 
             { "file.write", typeof(CmdFile.Write) },
             { "file.delete", typeof(CmdFile.Delete) },

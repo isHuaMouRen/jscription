@@ -32,5 +32,15 @@ namespace Jscription.Core.Commands
                 return null;
             }
         }
+
+        public class Exists : CmdRoot
+        {
+            public required string path { get; set; }
+
+            public override object? Run()
+            {
+                return Directory.Exists(path);
+            }
+        }
     }
 }
