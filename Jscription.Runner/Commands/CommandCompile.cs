@@ -1,66 +1,115 @@
 ﻿using Jscription.Core.Compiler;
 using Jscription.Core.Utils;
 using Jscription.Runner.Utils;
-using System;
-using System.Collections.Generic;
-using System.Net.Http.Headers;
-using System.Text;
 
 namespace Jscription.Runner.Commands
 {
-    internal class CommandCompile:ICliCommand
+    internal class CommandCompile : ICliCommand
     {
         public string Name => "compile";
         public string Description => "将 Jscription 脚本编译为可执行的二进制文件";
         public string Usage => """
             格式:
-            compile <参数> [脚本文件路径]
+              compile [脚本文件路径]
+              compile --csharp-code [脚本文件路径]
 
-            compile --csharp-code   - 查看脚本翻译后的C#代码，仅查看。不做任何编译
+            参数说明:
+              compile --csharp-code   - 仅查看脚本翻译后的 C# 源代码，不生成二进制文件。
+              compile   - 编译为二进制文件
             """;
 
         public int Execute(string[] args)
         {
-            bool? csharp = null;
+            if (args == null || args.Length == 0)
+            {
+                Logger.Error("错误: 缺少必要参数或脚本文件路径。");
+                Console.WriteLine(Usage);
+                return 1;
+            }
+
+            bool onlyViewCSharp = false;
             string? filename = null;
 
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i].Equals("--csharp-code", StringComparison.OrdinalIgnoreCase))
                 {
-                    csharp = true;
-                    if (i + 1 < args.Length)
-                    {
-                        filename = args[i + 1];
-                        i++;
-                    }
-                    else
-                    {
-                        Logger.Error("错误: --csharp-code 参数后面缺少脚本文件路径。");
-                        return 1;
-                    }
+                    onlyViewCSharp = true;
+                }
+                else if (args[i].StartsWith("-"))
+                {
+                    Logger.Error($"错误: 无法识别的编译参数 '{args[i]}'");
+                    return 1;
+                }
+                else
+                {
+                    filename = args[i];
                 }
             }
 
-
-
-
-            if (csharp == true)
+            if (string.IsNullOrWhiteSpace(filename))
             {
-                var jsonContent = File.ReadAllText(filename!);
-                var jscriptionDoc = JscriptionReader.ReadDoc(jsonContent);
-
-                var compiler = new JscriptionCompiler();
-                var result = compiler.TranspileToCSharp(jscriptionDoc!);
-
-                Console.WriteLine(result);
-
-                return 0;
+                Logger.Error("错误: 未指定 Jscription 脚本文件的路径。");
+                return 1;
             }
 
+            if (!File.Exists(filename))
+            {
+                Logger.Error($"错误: 找不到指定的脚本文件 -> \"{filename}\"");
+                return 1;
+            }
 
-            return 0;
+            try
+            {
+                string jsonContent = File.ReadAllText(filename);
+                var jscriptionDoc = JscriptionReader.ReadDoc(jsonContent);
 
+                if (jscriptionDoc == null)
+                {
+                    Logger.Error("错误: 脚本反序列化失败，请检查 JSON 结构。");
+                    return 1;
+                }
+
+                var compiler = new JscriptionCompiler();
+                string csharpCode = compiler.TranspileToCSharp(jscriptionDoc);
+
+                if (onlyViewCSharp)
+                {
+                    Console.WriteLine(csharpCode);
+                    return 0;
+                }
+
+                string outputExeName = !string.IsNullOrWhiteSpace(jscriptionDoc.Name)
+                    ? $"{jscriptionDoc.Name}.exe"
+                    : $"{Path.GetFileNameWithoutExtension(filename)}.exe";
+
+                string outputExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, outputExeName);
+
+                Console.WriteLine($"[Roslyn] 正在将 '{jscriptionDoc.Name}' 编译为控制台程序...");
+
+                var binaryCompiler = new JscriptionBinaryCompiler();
+                if (binaryCompiler.CompileToFile(csharpCode, outputExePath, out var errors))
+                {
+                    Console.WriteLine($"[成功] 二进制文件已输出至: {outputExePath}");
+                    return 0;
+                }
+                else
+                {
+                    Logger.Error("[失败] Roslyn 引擎拒绝了这段代码，编译错误详情：");
+                    foreach (var err in errors)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"  -> {err}");
+                    }
+                    Console.ResetColor();
+                    return 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"[Jscription 编译期硬件崩溃]: {ex.Message}");
+                return 1;
+            }
         }
     }
 }
