@@ -12,7 +12,8 @@ namespace Jscription.Runner
         {
             { "run", new CommandRun() },
             { "version", new CommandVersion() },
-            { "help", new CommandHelp() }
+            { "help", new CommandHelp() },
+            { "compile", new CommandCompile() }
         };
 
         static int Main(string[] args)
