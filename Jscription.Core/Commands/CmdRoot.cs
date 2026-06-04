@@ -1,4 +1,5 @@
 ﻿using Jscription.Core.Exceptions;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -47,9 +48,18 @@ namespace Jscription.Core.Commands
                             }
                             else
                             {
-                                var resolvedValue = ResolveVariable(rawValue, _globalVariables);
+                                object finalValue;
 
-                                var token = Newtonsoft.Json.Linq.JToken.FromObject(resolvedValue);
+                                if (IsNestedCommandToken(rawValue))
+                                {
+                                    finalValue = EvaluateNestedCommand(rawValue);
+                                }
+                                else
+                                {
+                                    finalValue = ResolveVariable(rawValue, _globalVariables);
+                                }
+
+                                var token = JToken.FromObject(finalValue);
                                 var convertedValue = token.ToObject(prop.PropertyType);
                                 prop.SetValue(this, convertedValue);
                             }
@@ -83,6 +93,64 @@ namespace Jscription.Core.Commands
             {
                 _globalVariables[ReturnVarName] = result!;
             }
+        }
+
+        //递归求值，用于解析直接输入到参数内的命令
+        private object EvaluateNestedCommand(object rawValue)
+        {
+            if (rawValue is JObject jObj)
+            {
+                string? subCmdName = null;
+                JObject? subArgsToken = null;
+
+                foreach (var property in jObj.Properties())
+                {
+                    if (!property.Name.Equals("return", StringComparison.OrdinalIgnoreCase))
+                    {
+                        subCmdName = property.Name;
+                        subArgsToken = property.Value as JObject;
+                        break;
+                    }
+                }
+
+                if (subCmdName != null)
+                {
+                    var subArgs = new Dictionary<string, object>();
+                    if (subArgsToken != null)
+                    {
+                        foreach (var argProp in subArgsToken.Properties())
+                        {
+                            subArgs[argProp.Name] = argProp.Value;
+                        }
+                    }
+
+                    var tempCmd = CommandRegistry.CreateCommand(subCmdName, subArgs);
+                    if (tempCmd != null)
+                    {
+                        tempCmd.Initialize(subArgs, subCmdName, _globalVariables ?? new(), null, this.LineNumber);
+                        tempCmd.Execute();
+
+                        return tempCmd.Run() ?? "";
+                    }
+                }
+            }
+
+            return rawValue;
+        }
+
+        private bool IsNestedCommandToken(object rawValue)
+        {
+            if (rawValue is JObject jObj)
+            {
+                foreach (var property in jObj.Properties())
+                {
+                    if (!property.Name.Equals("return", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return CommandRegistry.CreateCommand(property.Name, null) != null;
+                    }
+                }
+            }
+            return false;
         }
 
         private object ResolveVariable(object rawValue, Dictionary<string, object>? variables)
@@ -180,6 +248,10 @@ namespace Jscription.Core.Commands
         {
             if (_rawArgs != null && _rawArgs.TryGetValue(key, out var rawValue))
             {
+                if (IsNestedCommandToken(rawValue))
+                {
+                    return EvaluateNestedCommand(rawValue);
+                }
                 return ResolveVariable(rawValue, _globalVariables);
             }
             var prop = this.GetType().GetProperty(key, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);

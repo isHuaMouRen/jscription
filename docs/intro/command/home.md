@@ -33,6 +33,7 @@
 
 * [Console 系列命令](/docs/intro/command/console.md)
 * [Control 系列命令](/docs/intro/command/control.md)
+* [Dir 系列命令](/docs/intro/command/dir.md)
 * [File 系列命令](/docs/intro/command/file.md)
 * [Variable 系列命令](/docs/intro/command/variable.md)
 
