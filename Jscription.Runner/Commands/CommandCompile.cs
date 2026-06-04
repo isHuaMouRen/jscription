@@ -85,7 +85,7 @@ namespace Jscription.Runner.Commands
 
                 string outputExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, outputExeName);
 
-                Console.WriteLine($"[Roslyn] 正在将 '{jscriptionDoc.Name}' 编译为控制台程序...");
+                Console.WriteLine($"[Compile] 正在将 '{jscriptionDoc.Name}' 编译为控制台程序...");
 
                 var binaryCompiler = new JscriptionBinaryCompiler();
                 if (binaryCompiler.CompileToFile(csharpCode, outputExePath, out var errors))
@@ -95,7 +95,7 @@ namespace Jscription.Runner.Commands
                 }
                 else
                 {
-                    Logger.Error("[失败] Roslyn 引擎拒绝了这段代码，编译错误详情：");
+                    Logger.Error("[失败] Dotnet CLI 拒绝了这段代码，编译错误详情：");
                     foreach (var err in errors)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
