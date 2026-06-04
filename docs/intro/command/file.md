@@ -31,28 +31,14 @@
 |-|-|
 |string|文件的内容|
 
-这是一个简单的示例，会读取位于 `C:\test.txt` 的文件并输出至命令行
+## file.exists
 
-```json
-{
-    "name": "Demo",
-    "variables": {
-        "file-content": null
-    },
-    "commands": [
-        {
-            "command": "file.read",
-            "arguments": {
-                "path": "C:\\test.txt"
-            },
-            "return": "file-content"
-        },
-        {
-            "command": "console.writeline",
-            "arguments": {
-                "message": "$file-content$"
-            }
-        }
-    ]
-}
-```
+检测文件是否存在
+
+|参数|类型|描述|
+|-|-|-|
+| `path` |string|文件路径|
+
+|返回值类型|描述|
+|-|-|
+|bool|文件是否存在|
