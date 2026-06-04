@@ -85,6 +85,8 @@ namespace Jscription.Runner.Commands
 
                 string outputExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, outputExeName);
 
+
+                Logger.Warn("[Compile] 编译功能目前仍在测试阶段，出现错误是正常的");
                 Console.WriteLine($"[Compile] 正在将 '{jscriptionDoc.Name}' 编译为控制台程序...");
 
                 var binaryCompiler = new JscriptionBinaryCompiler();

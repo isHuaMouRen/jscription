@@ -12,5 +12,12 @@ namespace Jscription.Runner.Utils
             Console.WriteLine(message);
             Console.ResetColor();
         }
+
+        public static void Warn(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
     }
 }
