@@ -13,6 +13,7 @@
             { "file.delete", typeof(CmdFile.Delete) },
             { "file.read", typeof(CmdFile.Read) },
             { "file.exists", typeof(CmdFile.Exists) },
+            { "dir.create", typeof(CmdDir.Create) },
             { "variable.set", typeof(CmdVariable.Set) },
             { "variable.get", typeof(CmdVariable.Get) },
             { "control.sleep", typeof(CmdControl.Sleep) },
