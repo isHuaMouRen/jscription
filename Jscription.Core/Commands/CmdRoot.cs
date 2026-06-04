@@ -68,7 +68,16 @@ namespace Jscription.Core.Commands
                 }
             }
 
-            object? result = Run();
+            object? result;
+            try
+            {
+                result = Run();
+            }
+            catch (JscriptionParseException) { throw; }
+            catch (Exception ex)
+            {
+                throw new JscriptionRuntimeException(this, ex.Message, ex);
+            }
 
             if (!string.IsNullOrWhiteSpace(ReturnVarName) && _globalVariables != null)
             {

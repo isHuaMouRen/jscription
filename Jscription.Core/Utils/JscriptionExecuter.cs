@@ -14,14 +14,7 @@ namespace Jscription.Core.Utils
                 if (cmd == null)
                     continue;
 
-                try
-                {
-                    cmd.Execute();
-                }
-                catch (Exception ex)
-                {
-                    throw new JscriptionRuntimeException(cmd, ex.Message, ex);
-                }
+                cmd.Execute();
             }
         }
     }
