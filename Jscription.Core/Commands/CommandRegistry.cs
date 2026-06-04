@@ -9,16 +9,21 @@
             { "console.readline", typeof(CmdConsole.ReadLine) },
             { "console.setcolor", typeof(CmdConsole.SetColor) },
             { "console.getcolor", typeof(CmdConsole.GetColor) },
+
+            { "control.sleep", typeof(CmdControl.Sleep) },
+            { "control.if", typeof(CmdControl.If) },
+            { "control.loop", typeof(CmdControl.Loop) },
+
+            { "dir.create", typeof(CmdDir.Create) },
+
             { "file.write", typeof(CmdFile.Write) },
             { "file.delete", typeof(CmdFile.Delete) },
             { "file.read", typeof(CmdFile.Read) },
             { "file.exists", typeof(CmdFile.Exists) },
-            { "dir.create", typeof(CmdDir.Create) },
+
             { "variable.set", typeof(CmdVariable.Set) },
             { "variable.get", typeof(CmdVariable.Get) },
-            { "control.sleep", typeof(CmdControl.Sleep) },
-            { "control.if", typeof(CmdControl.If) },
-            { "control.loop", typeof(CmdControl.Loop) }
+
         };
 
         public static CmdRoot? CreateCommand(string? cmdName, Dictionary<string, object>? args)
