@@ -9,3 +9,4 @@
     - [File 系列命令](/docs/intro/command/file.md)
     - [Variable 系列命令](/docs/intro/command/variable.md)
   + [Jscription Runner 教程](/docs/intro/runner-usage.md)
+  + [编译 Jscription 脚本为可执行文件](/docs/intro/compile.md)

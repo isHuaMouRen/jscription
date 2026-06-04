@@ -52,3 +52,17 @@ jscription version
 
 * **参数说明**
 * `version`：直接在终端输出当前可执行文件的版本号。
+
+### 4. 编译脚本为可执行文件 ( `compile` )
+
+编译 Jscription 脚本为可执行文件
+
+* **命令格式**
+
+```bash
+jscription compile <参数> [脚本路径]
+```
+
+* **参数说明**
+* `complie [脚本路径]`：编译脚本为可执行文件并输出在与Jscription Runner相同文件夹处
+* `complie --csharp-code [脚本路径]`：查看脚本翻译后的C#源代码，不进行任何编译，仅用于调试
