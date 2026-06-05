@@ -23,6 +23,8 @@
             { "file.read", typeof(CmdFile.Read) },
             { "file.exists", typeof(CmdFile.Exists) },
 
+            { "process.start", typeof(CmdProcess.Start) },
+
             { "variable.set", typeof(CmdVariable.Set) },
             { "variable.get", typeof(CmdVariable.Get) },
 

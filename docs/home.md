@@ -7,5 +7,6 @@
     - [Control 系列命令](/docs/intro/command/control.md)
     - [Dir 系列命令](/docs/intro/command/dir.md)
     - [File 系列命令](/docs/intro/command/file.md)
+    - [Process 系列命令](/docs/intro/command/process.md)
     - [Variable 系列命令](/docs/intro/command/variable.md)
   + [Jscription Runner 教程](/docs/intro/runner-usage.md)
