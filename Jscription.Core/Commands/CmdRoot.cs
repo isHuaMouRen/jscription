@@ -29,7 +29,7 @@ namespace Jscription.Core.Commands
             this.LineNumber = lineNumber;
         }
 
-        public void Execute()
+        public object? Execute()
         {
             if (_rawArgs != null)
             {
@@ -93,6 +93,8 @@ namespace Jscription.Core.Commands
             {
                 _globalVariables[ReturnVarName] = result!;
             }
+
+            return result;
         }
 
         //递归求值，用于解析直接输入到参数内的命令
@@ -128,9 +130,8 @@ namespace Jscription.Core.Commands
                     if (tempCmd != null)
                     {
                         tempCmd.Initialize(subArgs, subCmdName, _globalVariables ?? new(), null, this.LineNumber);
-                        tempCmd.Execute();
 
-                        return tempCmd.Run() ?? "";
+                        return tempCmd.Execute() ?? "";
                     }
                 }
             }
