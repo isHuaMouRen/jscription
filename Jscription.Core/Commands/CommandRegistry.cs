@@ -14,6 +14,8 @@
             { "control.if", typeof(CmdControl.If) },
             { "control.loop", typeof(CmdControl.Loop) },
 
+            { "dialog.messagebox", typeof(CmdDialog.MessageBox) },
+
             { "dir.create", typeof(CmdDir.Create) },
             { "dir.delete", typeof(CmdDir.Delete) },
             { "dir.exists", typeof(CmdDir.Exists) },
