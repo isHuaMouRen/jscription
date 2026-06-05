@@ -1,4 +1,6 @@
-﻿using Jscription.Core.Classes;
+﻿/*
+
+using Jscription.Core.Classes;
 using Jscription.Core.Utils;
 using Newtonsoft.Json.Linq;
 using System.Text;
@@ -289,3 +291,5 @@ namespace Jscription.Core.Compiler
         }
     }
 }
+
+*/

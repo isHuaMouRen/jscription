@@ -1,4 +1,4 @@
-﻿using Jscription.Core.Compiler;
+﻿/*using Jscription.Core.Compiler;
 using Jscription.Core.Utils;
 using Jscription.Runner.Utils;
 
@@ -120,4 +120,4 @@ namespace Jscription.Runner.Commands
             }
         }
     }
-}
+}*/
