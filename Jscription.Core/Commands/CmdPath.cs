@@ -29,5 +29,18 @@ namespace Jscription.Core.Commands
                 return Path.Combine(list.ToArray());
             }
         }
+
+        public class GetFileName : CmdRoot
+        {
+            public required string path { get; set; }
+
+            public override object? Run()
+            {
+                if (string.IsNullOrEmpty(path))
+                    throw new Exception("必要属性 `path` 未填写");
+
+                return Path.GetFileName(path);
+            }
+        }
     }
 }

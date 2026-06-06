@@ -30,6 +30,7 @@
             { "file.move", typeof(CmdFile.Move) },
 
             { "path.combine", typeof(CmdPath.Combine) },
+            { "path.getfilename", typeof(CmdPath.GetFileName) },
 
             { "process.start", typeof(CmdProcess.Start) },
 
