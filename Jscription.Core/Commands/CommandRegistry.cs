@@ -39,6 +39,8 @@
             { "math.round", typeof(CmdMath.Round) },
             { "math.truncate", typeof(CmdMath.Truncate) },
 
+            { "net.gethttp", typeof(CmdNet.GetHttp) },
+
             { "path.combine", typeof(CmdPath.Combine) },
             { "path.getfilename", typeof(CmdPath.GetFileName) },
             { "path.getextension", typeof(CmdPath.GetExtension) },
