@@ -1,0 +1,11 @@
+{
+    "name": "hello world",
+    "description": "一个简单的Hello world示例",
+    "commands": [
+        {
+            "console.writeline": {
+                "message": "Hello world!"
+            }
+        }
+    ]
+}
