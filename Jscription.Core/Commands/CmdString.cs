@@ -48,5 +48,17 @@ namespace Jscription.Core.Commands
                 return origin.Length;
             }
         }
+
+        public class SubString : CmdRoot
+        {
+            public required string origin { get; set; }
+            public required int startIndex { get; set; }
+            public required int length { get; set; }
+
+            public override object? Run()
+            {
+                return origin.Substring(startIndex, length);
+            }
+        }
     }
 }

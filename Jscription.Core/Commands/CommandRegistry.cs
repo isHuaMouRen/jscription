@@ -39,6 +39,7 @@
             { "string.trim", typeof(CmdString.Trim) },
             { "string.contains", typeof(CmdString.Contains) },
             { "string.length", typeof(CmdString.Length) },
+            { "string.substring", typeof(CmdString.SubString) },
 
             { "variable.set", typeof(CmdVariable.Set) },
             { "variable.get", typeof(CmdVariable.Get) },
