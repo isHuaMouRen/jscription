@@ -17,5 +17,15 @@ namespace Jscription.Core.Commands
                 return origin.Replace(oldChar, newChar);
             }
         }
+
+        public class Trim : CmdRoot
+        {
+            public required string origin { get; set; }
+
+            public override object? Run()
+            {
+                return origin.Trim();
+            }
+        }
     }
 }
