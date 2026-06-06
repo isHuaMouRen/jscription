@@ -42,5 +42,18 @@ namespace Jscription.Core.Commands
                 return Path.GetFileName(path);
             }
         }
+
+        public class GetExtension : CmdRoot
+        {
+            public required string path { get; set; }
+
+            public override object? Run()
+            {
+                if (string.IsNullOrEmpty(path))
+                    throw new Exception("必要属性 `path` 未填写");
+
+                return Path.GetExtension(path);
+            }
+        }
     }
 }

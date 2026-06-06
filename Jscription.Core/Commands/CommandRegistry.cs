@@ -31,6 +31,7 @@
 
             { "path.combine", typeof(CmdPath.Combine) },
             { "path.getfilename", typeof(CmdPath.GetFileName) },
+            { "path.getextension", typeof(CmdPath.GetExtension) },
 
             { "process.start", typeof(CmdProcess.Start) },
 

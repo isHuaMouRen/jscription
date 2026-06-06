@@ -23,7 +23,7 @@ Path 系列命令用于路径操作
 |-|-|
 |string|拼接完的路径|
 
-## path.combine
+## path.getfilename
 
 获得文件名
 
@@ -36,3 +36,17 @@ Path 系列命令用于路径操作
 |返回值类型|描述|
 |-|-|
 |string|文件名|
+
+## path.getextension
+
+获得文件扩展名
+
+给出一个路径 `C:\test\1.txt` 返回 `.txt`
+
+|参数|类型|描述|
+|-|-|-|
+| `path` |string|文件路径|
+
+|返回值类型|描述|
+|-|-|
+|string|文件扩展名|
