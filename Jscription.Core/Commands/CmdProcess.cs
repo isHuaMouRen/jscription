@@ -22,21 +22,30 @@ namespace Jscription.Core.Commands
                 if (string.IsNullOrEmpty(path))
                     throw new Exception("必要参数 path 未定义");
 
+                bool shouldRedirect = (waitForExit ?? false) && !(useShell ?? false);
+
                 var processstartinfo = new ProcessStartInfo
                 {
                     FileName = path,
                     Arguments = args,
                     UseShellExecute = useShell ?? false,
                     WorkingDirectory = workingDir ?? "",
-                    CreateNoWindow = createNoWindow ?? false
+                    CreateNoWindow = createNoWindow ?? false,
+                    RedirectStandardOutput = shouldRedirect
                 };
 
                 using var process = Process.Start(processstartinfo);
 
-                if (waitForExit ?? false)
-                    process?.WaitForExit();
+                if (!(waitForExit ?? false))
+                    return 0;
 
-                return process?.ExitCode;
+                string? output = "";
+                if (shouldRedirect)
+                    output = process?.StandardOutput.ReadToEnd();
+
+                process?.WaitForExit();
+
+                return !string.IsNullOrEmpty(output) ? output.Trim() : process?.ExitCode;
             }
         }
     }
