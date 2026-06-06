@@ -10,5 +10,5 @@
     - [File 系列命令](/docs/intro/command/file.md)
     - [Process 系列命令](/docs/intro/command/process.md)
     - [String 系列命令](/docs/intro/command/string.md)
-    - [Variable 系列命令](/docs/intro/command/variable.md)
+    - [Var 系列命令](/docs/intro/command/var.md)
   + [Jscription Runner 教程](/docs/intro/runner-usage.md)

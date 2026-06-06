@@ -41,8 +41,8 @@
             { "string.length", typeof(CmdString.Length) },
             { "string.substring", typeof(CmdString.SubString) },
 
-            { "variable.set", typeof(CmdVariable.Set) },
-            { "variable.get", typeof(CmdVariable.Get) },
+            { "var.set", typeof(CmdVar.Set) },
+            { "var.get", typeof(CmdVar.Get) },
 
         };
 

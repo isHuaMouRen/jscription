@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Jscription.Core.Commands
 {
-    public class CmdVariable
+    public class CmdVar
     {
         public class Set : CmdRoot
         {
