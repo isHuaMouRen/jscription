@@ -27,5 +27,16 @@ namespace Jscription.Core.Commands
                 return origin.Trim();
             }
         }
+
+        public class Contains : CmdRoot
+        {
+            public required string origin { get; set; }
+            public required string value { get; set; }
+
+            public override object? Run()
+            {
+                return origin.Contains(value);
+            }
+        }
     }
 }

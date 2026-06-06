@@ -24,14 +24,27 @@ String 系列命令用于字符串操作
 
 去除某字符串的头尾空格，整理字符串
 
-比如替换 `Hello world!` 内的所有 `o` 为 `e` 则结果为 `Helle werld!`
+比如输入 `   Hello   ` 会被处理为 `Hello`
 
 |参数|类型|描述|
 |-|-|-|
 | `origin` |string|原字符串|
-| `oldChar` |string|旧字符|
-| `newChar` |string|要替换为的新字符|
 
 |返回值类型|描述|
 |-|-|
-|string|替换后的字符串|
+|string|整理完的字符串|
+
+## string.contains
+
+判断字符串是否包含某字符串
+
+比如判断字符串 `Hello world!` 内是否包含 `Hello` 结果为true
+
+|参数|类型|描述|
+|-|-|-|
+| `origin` |string|原字符串|
+| `value` |string|目标字符串|
+
+|返回值类型|描述|
+|-|-|
+|bool|原字符串是否包含目标字符串|
