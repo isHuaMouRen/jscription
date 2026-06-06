@@ -40,5 +40,17 @@ namespace Jscription.Core.Commands
                 return File.Exists(path);
             }
         }
+
+        public class Copy : CmdRoot
+        {
+            public required string source { get; set; }
+            public required string dest { get; set; }
+
+            public override object? Run()
+            {
+                File.Copy(source, dest);
+                return null;
+            }
+        }
     }
 }
