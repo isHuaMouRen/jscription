@@ -9,7 +9,7 @@
 |参数|类型|描述|
 |-|-|-|
 | `varName` |string|变量名 (不可以带 `$$` ，必须纯变量名。比如 `var1` 而不是 `$var1$` !!)|
-| `value` |object|目标值|
+| `value` |object|目标值，可使用 `+`  `-`  `*`  `/` 字符进行运算，例如 `$var1$ + 1` |
 
 ## variable.get
 
