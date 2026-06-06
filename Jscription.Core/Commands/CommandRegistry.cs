@@ -29,6 +29,16 @@
             { "file.copy", typeof(CmdFile.Copy) },
             { "file.move", typeof(CmdFile.Move) },
 
+            { "math.abs", typeof(CmdMath.Abs) },
+            { "math.max", typeof(CmdMath.Max) },
+            { "math.min", typeof(CmdMath.Min) },
+            { "math.sign", typeof(CmdMath.Sign) },
+            { "math.clamp", typeof(CmdMath.Clamp) },
+            { "math.ceiling", typeof(CmdMath.Ceiling) },
+            { "math.floor", typeof(CmdMath.Floor) },
+            { "math.round", typeof(CmdMath.Round) },
+            { "math.truncate", typeof(CmdMath.Truncate) },
+
             { "path.combine", typeof(CmdPath.Combine) },
             { "path.getfilename", typeof(CmdPath.GetFileName) },
             { "path.getextension", typeof(CmdPath.GetExtension) },

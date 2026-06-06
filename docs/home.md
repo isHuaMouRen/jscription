@@ -8,6 +8,7 @@
     - [Dir 系列命令](/docs/intro/command/dir.md)
     - [Env 系列命令](/docs/intro/command/env.md)
     - [File 系列命令](/docs/intro/command/file.md)
+    - [Math 系列命令](/docs/intro/command/math.md)
     - [Process 系列命令](/docs/intro/command/process.md)
     - [String 系列命令](/docs/intro/command/string.md)
     - [Var 系列命令](/docs/intro/command/var.md)
