@@ -45,10 +45,14 @@ namespace Jscription.Core.Commands
         {
             public required string source { get; set; }
             public required string dest { get; set; }
+            public bool? overwrite{ get; set; }
 
             public override object? Run()
             {
-                File.Copy(source, dest);
+                if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(dest))
+                    throw new Exception("必要参数 `source` 或 `dest` 未填写！");
+
+                File.Copy(source, dest, overwrite ?? false);
                 return null;
             }
         }
@@ -57,10 +61,14 @@ namespace Jscription.Core.Commands
         {
             public required string source { get; set; }
             public required string dest { get; set; }
+            public bool? overwrite{ get; set; }
 
             public override object? Run()
             {
-                File.Move(source, dest);
+                if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(dest))
+                    throw new Exception("必要参数 `source` 或 `dest` 未填写！");
+
+                File.Move(source, dest, overwrite ?? false);
                 return null;
             }
         }

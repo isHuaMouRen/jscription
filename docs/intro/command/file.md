@@ -51,6 +51,7 @@
 |-|-|-|
 | `source` |string|原文件路径|
 | `dest` |string|目标路径|
+| `overwrite` |bool?|如目标已存在，是否复写|
 
 ## file.move
 
@@ -60,3 +61,4 @@
 |-|-|-|
 | `source` |string|原文件路径|
 | `dest` |string|目标路径|
+| `overwrite` |bool?|如目标已存在，是否复写|
