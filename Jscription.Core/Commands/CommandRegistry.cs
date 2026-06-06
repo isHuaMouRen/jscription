@@ -29,6 +29,8 @@
             { "file.copy", typeof(CmdFile.Copy) },
             { "file.move", typeof(CmdFile.Move) },
 
+            { "path.combine", typeof(CmdPath.Combine) },
+
             { "process.start", typeof(CmdProcess.Start) },
 
             { "string.replace", typeof(CmdString.Replace) },
