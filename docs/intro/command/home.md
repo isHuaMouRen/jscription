@@ -36,6 +36,7 @@
 * [Dir 系列命令](/docs/intro/command/dir.md)
 * [File 系列命令](/docs/intro/command/file.md)
 * [Process 系列命令](/docs/intro/command/process.md)
+* [String 系列命令](/docs/intro/command/string.md)
 * [Variable 系列命令](/docs/intro/command/variable.md)
 
 ## 旧语法 (弃用)

@@ -27,6 +27,8 @@
 
             { "process.start", typeof(CmdProcess.Start) },
 
+            { "string.replace", typeof(CmdString.Replace) },
+
             { "variable.set", typeof(CmdVariable.Set) },
             { "variable.get", typeof(CmdVariable.Get) },
 
