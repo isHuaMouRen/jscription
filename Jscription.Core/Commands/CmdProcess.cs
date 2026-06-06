@@ -14,6 +14,7 @@ namespace Jscription.Core.Commands
             public bool? useShell { get; set; }
             public string? workingDir { get; set; }
             public bool? createNoWindow { get; set; }
+            public bool? waitForExit { get; set; }
 
 
             public override object? Run()
@@ -27,12 +28,15 @@ namespace Jscription.Core.Commands
                     Arguments = args,
                     UseShellExecute = useShell ?? false,
                     WorkingDirectory = workingDir ?? "",
-                    CreateNoWindow=createNoWindow??false
+                    CreateNoWindow = createNoWindow ?? false
                 };
 
-                Process.Start(processstartinfo);
+                using var process = Process.Start(processstartinfo);
 
-                return null;
+                if (waitForExit ?? false)
+                    process?.WaitForExit();
+
+                return process?.ExitCode;
             }
         }
     }
