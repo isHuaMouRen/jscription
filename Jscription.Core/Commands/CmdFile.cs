@@ -52,5 +52,17 @@ namespace Jscription.Core.Commands
                 return null;
             }
         }
+
+        public class Move : CmdRoot
+        {
+            public required string source { get; set; }
+            public required string dest { get; set; }
+
+            public override object? Run()
+            {
+                File.Move(source, dest);
+                return null;
+            }
+        }
     }
 }

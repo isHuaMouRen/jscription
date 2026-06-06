@@ -25,6 +25,7 @@
             { "file.read", typeof(CmdFile.Read) },
             { "file.exists", typeof(CmdFile.Exists) },
             { "file.copy", typeof(CmdFile.Copy) },
+            { "file.move", typeof(CmdFile.Move) },
 
             { "process.start", typeof(CmdProcess.Start) },
 
