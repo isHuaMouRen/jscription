@@ -38,5 +38,15 @@ namespace Jscription.Core.Commands
                 return origin.Contains(value);
             }
         }
+
+        public class Length : CmdRoot
+        {
+            public required string origin { get; set; }
+
+            public override object? Run()
+            {
+                return origin.Length;
+            }
+        }
     }
 }
