@@ -131,7 +131,21 @@ namespace Jscription.Core.Commands
                     {
                         tempCmd.Initialize(subArgs, subCmdName, _globalVariables ?? new(), null, this.LineNumber);
 
-                        return tempCmd.Execute() ?? "";
+                        object? finalResult = tempCmd.Execute() ?? "";
+
+                        if (_rawArgs != null)
+                        {
+                            foreach (var kp in new List<string>(_rawArgs.Keys))
+                            {
+                                if (_rawArgs[kp] == rawValue)
+                                {
+                                    _rawArgs[kp] = finalResult;
+                                    break;
+                                }
+                            }
+                        }
+
+                        return finalResult;
                     }
                 }
             }
