@@ -6,6 +6,7 @@
     - [Console 系列命令](/docs/intro/command/console.md)
     - [Control 系列命令](/docs/intro/command/control.md)
     - [Dir 系列命令](/docs/intro/command/dir.md)
+    - [Env 系列命令](/docs/intro/command/env.md)
     - [File 系列命令](/docs/intro/command/file.md)
     - [Process 系列命令](/docs/intro/command/process.md)
     - [String 系列命令](/docs/intro/command/string.md)

@@ -20,6 +20,8 @@
             { "dir.delete", typeof(CmdDir.Delete) },
             { "dir.exists", typeof(CmdDir.Exists) },
 
+            { "env.getvar", typeof(CmdEnv.GetVar) },
+
             { "file.write", typeof(CmdFile.Write) },
             { "file.delete", typeof(CmdFile.Delete) },
             { "file.read", typeof(CmdFile.Read) },
