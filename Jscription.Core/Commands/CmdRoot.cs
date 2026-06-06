@@ -1,6 +1,7 @@
 ﻿using Jscription.Core.Exceptions;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -11,6 +12,24 @@ namespace Jscription.Core.Commands
     //基类
     public abstract class CmdRoot
     {
+        private static readonly ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>> _propertyCache = new();//反射缓存
+        private Dictionary<string, PropertyInfo> GetCachedProperties()
+        {
+            var type = this.GetType();
+            return _propertyCache.GetOrAdd(type, t =>
+            {
+                return t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .ToDictionary(
+                            p => p.Name,
+                            p => p,
+                            StringComparer.OrdinalIgnoreCase
+                        );
+            });
+        }
+
+
+
+
         protected Dictionary<string, object>? _globalVariables;
         private Dictionary<string, object>? _rawArgs;
 
@@ -31,52 +50,7 @@ namespace Jscription.Core.Commands
 
         public object? Execute()
         {
-            if (_rawArgs != null)
-            {
-                var insensitiveArgs = new Dictionary<string, object>(_rawArgs, StringComparer.OrdinalIgnoreCase);
-                var properties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                foreach (var prop in properties)
-                {
-                    if (insensitiveArgs.TryGetValue(prop.Name, out var rawValue))
-                    {
-                        try
-                        {
-                            if (rawValue is List<CmdRoot> compiledBlock)
-                            {
-                                prop.SetValue(this, compiledBlock);
-                            }
-                            else
-                            {
-                                object finalValue;
-
-                                if (IsNestedCommandToken(rawValue))
-                                {
-                                    finalValue = EvaluateNestedCommand(rawValue);
-                                }
-                                else
-                                {
-                                    finalValue = ResolveVariable(rawValue, _globalVariables);
-                                }
-
-                                var token = JToken.FromObject(finalValue);
-                                var convertedValue = token.ToObject(prop.PropertyType);
-                                prop.SetValue(this, convertedValue);
-                            }
-                        }
-                        catch (JscriptionVariableNotFoundException) { throw; }
-                        catch (Exception ex)
-                        {
-                            throw new JscriptionInvalidArgumentsException(
-                                CommandName,
-                                prop.Name,
-                                $"参数类型不匹配。详情: {ex.Message}",
-                                this.LineNumber
-                            );
-                        }
-                    }
-                }
-            }
+            BindArguments();
 
             object? result;
             try
@@ -95,6 +69,54 @@ namespace Jscription.Core.Commands
             }
 
             return result;
+        }
+
+        private void BindArguments()
+        {
+            if (_rawArgs == null) return;
+
+            var insensitiveArgs = new Dictionary<string, object>(_rawArgs, StringComparer.OrdinalIgnoreCase);
+            var properties = GetCachedProperties();
+
+            foreach (var prop in properties.Values)
+            {
+                if (!insensitiveArgs.TryGetValue(prop.Name, out var rawValue))
+                    continue;
+
+                try
+                {
+                    if (rawValue is List<CmdRoot> compiledBlock)
+                    {
+                        prop.SetValue(this, compiledBlock);
+                        continue;
+                    }
+
+                    object finalValue;
+
+                    if (IsNestedCommandToken(rawValue))
+                    {
+                        finalValue = EvaluateNestedCommand(rawValue);
+                    }
+                    else
+                    {
+                        finalValue = ResolveVariable(rawValue, _globalVariables);
+                    }
+
+                    var token = JToken.FromObject(finalValue);
+                    var convertedValue = token.ToObject(prop.PropertyType);
+                    prop.SetValue(this, convertedValue);
+                }
+                catch (JscriptionVariableNotFoundException) { throw; }
+                catch (Exception ex)
+                {
+                    throw new JscriptionInvalidArgumentsException(
+                        CommandName,
+                        prop.Name,
+                        $"参数类型不匹配。详情: {ex.Message}",
+                        this.LineNumber
+                    );
+                }
+            }
         }
 
         //递归求值，用于解析直接输入到参数内的命令
@@ -269,8 +291,14 @@ namespace Jscription.Core.Commands
                 }
                 return ResolveVariable(rawValue, _globalVariables);
             }
-            var prop = this.GetType().GetProperty(key, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-            return prop?.GetValue(this);
+
+            var properties = GetCachedProperties();
+            if (properties.TryGetValue(key, out var prop))
+            {
+                return prop.GetValue(this);
+            }
+
+            return null;
         }
     }
 }
