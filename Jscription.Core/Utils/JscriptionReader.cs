@@ -111,7 +111,7 @@ namespace Jscription.Core.Utils
             if (doc.Name == null) throw new JscriptionMissingFieldException("name", "脚本名字不能为空，请使用 \"name\" 属性");
             if (doc.Commands == null) throw new JscriptionMissingFieldException("commands", "脚本不能没有命令列表，即使没有命令也要使用 \"commands\": []");
 
-            var variables = doc.Variables ?? new Dictionary<string, object>();
+            var context = new Commands.ExecutionContext(doc.Variables ?? new Dictionary<string, object>());
 
             // 递归编译方法
             List<CmdRoot> CompileCommandInfos(List<JscriptionDoc.CommandInfo> infos)
@@ -154,7 +154,7 @@ namespace Jscription.Core.Utils
                     }
 
                     // 注入 LineNumber 上下文变量
-                    parsedCmd.Initialize(cmd.Arguments, cmdName, variables, cmd.Return, cmd.LineNumber);
+                    parsedCmd.Initialize(cmd.Arguments, cmdName, context, cmd.Return, cmd.LineNumber);
                     compiledList.Add(parsedCmd);
                 }
 

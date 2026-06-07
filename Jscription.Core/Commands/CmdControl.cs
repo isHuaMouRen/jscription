@@ -26,7 +26,7 @@ namespace Jscription.Core.Commands
 
             public override object? Run()
             {
-                if (_globalVariables == null)
+                if (_context?.Variables == null)
                     throw new Exception($"命令 [{CommandName}] 运行时丢失了上下文变量字典。");
 
                 var currentCondition = GetDynamicArgument(nameof(condition));
@@ -54,7 +54,7 @@ namespace Jscription.Core.Commands
 
             public override object? Run()
             {
-                if (_globalVariables == null) throw new Exception($"命令 [{CommandName}] 运行时丢失上下文。");
+                if (_context?.Variables == null) throw new Exception($"命令 [{CommandName}] 运行时丢失上下文。");
                 if (@do == null || @do.Count == 0) return null;
 
                 while (true)

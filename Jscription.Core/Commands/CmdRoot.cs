@@ -30,7 +30,7 @@ namespace Jscription.Core.Commands
 
 
 
-        protected Dictionary<string, object>? _globalVariables;
+        protected ExecutionContext? _context;
         private Dictionary<string, object>? _rawArgs;
 
         public string CommandName { get; private set; } = "Unknown";
@@ -39,10 +39,10 @@ namespace Jscription.Core.Commands
 
         public abstract object? Run();
 
-        public void Initialize(Dictionary<string, object>? args, string commandName, Dictionary<string, object> variables, string? returnVarName = null, int lineNumber = 0)
+        public void Initialize(Dictionary<string, object>? args, string commandName, ExecutionContext context, string? returnVarName = null, int lineNumber = 0)
         {
             this.CommandName = commandName;
-            this._globalVariables = variables;
+            this._context = context;
             this._rawArgs = args;
             this.ReturnVarName = returnVarName;
             this.LineNumber = lineNumber;
@@ -63,9 +63,9 @@ namespace Jscription.Core.Commands
                 throw new JscriptionRuntimeException(this, ex.Message, ex);
             }
 
-            if (!string.IsNullOrWhiteSpace(ReturnVarName) && _globalVariables != null)
+            if (!string.IsNullOrWhiteSpace(ReturnVarName) && _context != null)
             {
-                _globalVariables[ReturnVarName] = result!;
+                _context.Variables[ReturnVarName] = result!;
             }
 
             return result;
@@ -99,7 +99,7 @@ namespace Jscription.Core.Commands
                     }
                     else
                     {
-                        finalValue = ResolveVariable(rawValue, _globalVariables);
+                        finalValue = ResolveVariable(rawValue, _context?.Variables);
                     }
 
                     var token = JToken.FromObject(finalValue);
@@ -151,21 +151,8 @@ namespace Jscription.Core.Commands
                     var tempCmd = CommandRegistry.CreateCommand(subCmdName, subArgs);
                     if (tempCmd != null)
                     {
-                        tempCmd.Initialize(subArgs, subCmdName, _globalVariables ?? new(), null, this.LineNumber);
-
+                        tempCmd.Initialize(subArgs, subCmdName, _context ?? new ExecutionContext(new Dictionary<string, object>()), null, this.LineNumber);
                         object? finalResult = tempCmd.Execute() ?? "";
-
-                        if (_rawArgs != null)
-                        {
-                            foreach (var kp in new List<string>(_rawArgs.Keys))
-                            {
-                                if (_rawArgs[kp] == rawValue)
-                                {
-                                    _rawArgs[kp] = finalResult;
-                                    break;
-                                }
-                            }
-                        }
 
                         return finalResult;
                     }
@@ -289,7 +276,7 @@ namespace Jscription.Core.Commands
                 {
                     return EvaluateNestedCommand(rawValue);
                 }
-                return ResolveVariable(rawValue, _globalVariables);
+                return ResolveVariable(rawValue, _context?.Variables);
             }
 
             var properties = GetCachedProperties();
