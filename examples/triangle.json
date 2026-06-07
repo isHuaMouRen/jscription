@@ -1,0 +1,62 @@
+{
+    "name": "char-triangle",
+    "description": "简单的字符画三角形",
+    "variables": {
+        "triangle-length": 10,
+        "fill-char": "#",
+        "i": 0,
+        "j": 0,
+        "temp-str": ""
+    },
+    "commands": [
+        {
+            "control.loop": {
+                "condition": "$i$ < $triangle-length$",
+                "do": [
+                    {
+                        "var.set": {
+                            "varName": "i",
+                            "value": "$i$ + 1"
+                        }
+                    },
+                    {
+                        "var.set": {
+                            "varName": "j",
+                            "value": 0
+                        }
+                    },
+                    {
+                        "var.set": {
+                            "varName": "temp-str",
+                            "value": ""
+                        }
+                    },
+                    {
+                        "control.loop": {
+                            "condition": "$j$ < $i$",
+                            "do": [
+                                {
+                                    "var.set": {
+                                        "varName": "j",
+                                        "value": "$j$ + 1"
+                                    }
+                                },
+                                {
+                                    "var.set": {
+                                        "varName": "temp-str",
+                                        "value": "$temp-str$ + $fill-char$"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "console.writeline": {
+                            "message": "$temp-str$"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
